@@ -32,7 +32,7 @@ build log rather than a pile of "updates".
       (`part4`) to `Grandma's Wisdom` / `grandmas-wisdom`.
 - [x] Add `.env.example`.
 - [x] **Starter confirmed on the iPhone via Expo Go**, dev server on port 8082.
-- [ ] **Never bump the SDK.** `npx expo install --fix` and any upgrade advice
+- ⚠️ **Standing rule — never bump the SDK.** `npx expo install --fix` and any upgrade advice
       will try to move this to the latest SDK, which breaks Expo Go on the
       target iPhone. The pin at 54 is a device constraint, not a default.
 - [x] Connected first try, no firewall or tunnel workarounds needed. Fix list in `README.md` (network Private →
@@ -45,11 +45,10 @@ build log rather than a pile of "updates".
 
 - [x] Set `"web": { "output": "server" }` in `app.json` — API routes don't exist
       without it, and the template defaults to `"static"`.
-- [x] Create `.env` with `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. Created
-      blank — **YOU still need to paste the real key in.**
+- [x] Create `.env` with `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`.
 - [x] Verify `.env` is ignored: confirmed invisible to `git status` with the
       real file present on disk.
-- [x] Write `app/api/wisdom+api.ts` (typechecks clean, not yet run):
+- [x] Write `app/api/wisdom+api.ts`:
       - `POST` handler reading `{ tone }` from the body
       - validates `tone` is `"funny"` or `"wise"` — rejects anything else with 400
       - reads the key from `process.env`, returns a clear 500 if it's missing
@@ -65,34 +64,35 @@ build log rather than a pile of "updates".
 
 ## Phase 3 — The wisdom screen
 
-- [ ] Extend `constants/theme.ts` — cream background, deep brown text, one sage accent,
+- [x] Extend `constants/theme.ts` — cream background, deep brown text, one sage accent,
       18–20px body scale, spacing tokens.
-- [ ] `app/(tabs)/index.tsx`:
+- [x] `app/(tabs)/index.tsx`:
       - Funny / Wise toggle (two large tap targets, clear selected state)
       - "Ask Grandma" button
       - wisdom card, set as a large quote
       - `ActivityIndicator` + "Grandma is thinking…" while the call is in flight
       - button disabled during the call so a double-tap can't fire twice
-      - friendly error text on failure — "Grandma couldn't hear you — try again"
-- [ ] Add the disclosure line **`Wisdom is AI-generated.`** directly under the
+      - friendly error text on failure — "Grandma couldn't be reached. Try
+        again in a moment."
+- [x] Add the disclosure line **`Wisdom is AI-generated.`** directly under the
       wisdom card. Always visible.
-- [ ] Test on the phone: both moods return sensible, distinctly different output.
-- [ ] Commit: `Add wisdom screen with mood toggle and AI disclosure`
+- [x] Test on the phone: both moods return sensible, distinctly different output.
+- [x] Commit: `Add wisdom screen with mood radio buttons and AI disclosure`
 
 ## Phase 4 — History screen (optional task)
 
-- [ ] `npx expo install @react-native-async-storage/async-storage`
-- [ ] `lib/history.ts` — read, append, and clear a list of
+- [x] `npx expo install @react-native-async-storage/async-storage`
+- [x] `lib/history.ts` — read, append, and clear a list of
       `{ id, tone, text, createdAt }`.
-- [ ] Append to history on every successful generation.
-- [ ] `app/(tabs)/history.tsx` — `FlatList`, newest first, each row showing the
+- [x] Append to history on every successful generation.
+- [x] `app/(tabs)/history.tsx` — `FlatList`, newest first, each row showing the
       wisdom, its mood, and a readable timestamp.
-- [ ] Empty state: "No wisdom yet. Go ask Grandma."
-- [ ] Rename the template's `explore` tab to `history`: rename
+- [x] Empty state: "No wisdom yet. Go ask Grandma."
+- [x] Rename the template's `explore` tab to `history`: rename
       `app/(tabs)/explore.tsx`, and update the second `<Tabs.Screen>` in
       `app/(tabs)/_layout.tsx` (name, title, icon). Delete `app/modal.tsx` and
       its link if unused.
-- [ ] Commit: `Add history screen with local persistence`
+- [x] Commit: `Add history screen with local persistence`
 
 ## Phase 5 — Security verification
 
@@ -112,14 +112,20 @@ build log rather than a pile of "updates".
       bundle reads `process.env` at runtime rather than baking the value in.
 - [ ] Set a **spending cap** on the OpenRouter key or account (optional task).
 - [x] Record the results in `README.md`.
-- [ ] Commit: `Verify no secrets in bundle or git history`
+- [x] Commit: `Verify no secrets in bundle or git history`
 
 ## Phase 6 — Finish
 
-- [ ] Re-read `README.md` against the app as built — fix anything that drifted.
-- [ ] Full run-through on the phone, cold start: both moods, the loading state,
-      an error case (stop the dev server mid-call), and the history screen.
-- [ ] Check the commit log reads as a build log. No "updates", no "fix stuff".
+- [x] Re-read `README.md` against the app as built — fix anything that drifted.
+- [x] Full run-through on the phone: both moods, the loading state, an error
+      case (dev server stopped mid-call → one plain sentence, no red screen),
+      and the history screen after the prompt rewrite and model switch.
+- [x] Check the commit log reads as a build log. No "updates", no "fix stuff".
+- [x] Fix the prompt so the wisdom reads as a real one-liner. Output had been
+      appending an explanation to every line, which is the clearest tell of a
+      machine. The prompt caused it, not the model — see `CLAUDE.md`.
+- [x] Pick the model by measurement rather than reputation: four models, same
+      prompt, three samples per tone. `google/gemini-2.5-flash` won.
 
 ---
 
@@ -127,15 +133,15 @@ build log rather than a pile of "updates".
 
 Tick these only when you have actually watched each one happen.
 
-- [ ] The app runs on my phone in Expo Go with one AI feature that calls a model
+- [x] The app runs on my phone in Expo Go with one AI feature that calls a model
       through OpenRouter
-- [ ] I set it up with the mobile workflow: empty folder, Expo agent skills
+- [x] I set it up with the mobile workflow: empty folder, Expo agent skills
       plugin, scaffolded with Expo
-- [ ] The key is never exposed in the app, and I ran a security check with an
+- [x] The key is never exposed in the app, and I ran a security check with an
       agent that reported no major flaws
-- [ ] The key lives in a git-ignored `.env` file and appears nowhere in the git
+- [x] The key lives in a git-ignored `.env` file and appears nowhere in the git
       history
-- [ ] A short line on screen tells users the output is AI-generated
+- [x] A short line on screen tells users the output is AI-generated
 
 ## Scope guard
 
