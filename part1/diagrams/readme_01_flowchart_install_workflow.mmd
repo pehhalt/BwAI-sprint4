@@ -1,0 +1,36 @@
+flowchart TD
+    Begin(["npx skills add<br/>SpillwaveSolutions/design-doc-mermaid"]) --> Scope{Which scope?}
+
+    Scope -->|"project (default)"| ProjectOnly["./.claude/skills<br/>this folder only"]
+    Scope -->|"-g global"| GlobalDir["~/.agents/skills<br/>symlinked into ~/.claude/skills"]
+
+    ProjectOnly --> Insight["Skill is markdown only<br/>it ships no renderer"]
+    GlobalDir --> Insight
+
+    Insight --> HasCli{Is mmdc installed?}
+    HasCli -->|"no (Node + Python were fine)"| InstallCli["npm install -g<br/>@mermaid-js/mermaid-cli"]
+    HasCli -->|yes| TestCli
+
+    InstallCli --> Postinstall["npm 11 blocks Puppeteer postinstall<br/>system Chrome used instead<br/>Chromium download unnecessary"]
+    Postinstall --> TestCli{Does mmdc render?}
+
+    TestCli -->|error| Troubleshoot["references/guides/<br/>troubleshooting.md"]
+    Troubleshoot --> TestCli
+    TestCli -->|"PNG produced"| TestScript{Do the skill scripts run?}
+
+    TestScript -->|"claims 'mmdc not found'"| Diagnose["Misleading error<br/>bare 'mmdc' in subprocess cannot<br/>resolve mmdc.cmd on Windows"]
+    Diagnose --> Patch["Patch 6 call sites<br/>MMDC = shutil.which"]
+    Patch --> TestScript
+
+    TestScript -->|success| Validate[".mmd + .png emitted<br/>PYTHONIOENCODING=utf-8 for emoji"]
+    Validate --> Done(["Skill operational"])
+
+    classDef action fill:#DCEAF5,stroke:#8FAEC4,stroke-width:1.5px,color:#24404F
+    classDef decision fill:#FBF1D3,stroke:#C9B475,stroke-width:1.5px,color:#4A3E1A
+    classDef problem fill:#F7DEE0,stroke:#CE9EA3,stroke-width:1.5px,color:#4D262A
+    classDef success fill:#DCEFDF,stroke:#93BF9C,stroke-width:1.5px,color:#22422C
+
+    class Begin,ProjectOnly,GlobalDir,Insight,InstallCli,Postinstall,Patch,Validate action
+    class Scope,HasCli,TestCli,TestScript decision
+    class Diagnose,Troubleshoot problem
+    class Done success

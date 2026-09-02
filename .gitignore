@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+web-build/
+.expo/
+
+# local env files
+.env
+.env*.local
+
+# local Claude Code settings (agents and skills are committed, machine config is not)
+.claude/settings.local.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
