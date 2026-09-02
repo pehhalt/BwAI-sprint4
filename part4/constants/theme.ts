@@ -51,3 +51,36 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+/**
+ * Grandma's Wisdom design tokens.
+ *
+ * The app deliberately commits to one warm, calm look instead of following the
+ * system light/dark setting. The screen is essentially a single quote on paper,
+ * and a dark variant of that reads as a different app rather than the same one
+ * at night. Screens pull every colour, size and gap from here — no hardcoded
+ * hex values or magic numbers in components.
+ */
+export const Palette = {
+  background: '#FAF4E8', // warm cream, like old paper
+  surface: '#FFFDF8',
+  border: '#E7DCC6',
+  text: '#3E2F23', // deep warm brown
+  textMuted: '#8A7A69',
+  accent: '#6E8B6A', // sage
+  accentText: '#FFFFFF',
+  accentSoft: '#EAF0E8',
+  danger: '#A85A46',
+};
+
+export const Spacing = { xs: 6, sm: 10, md: 16, lg: 24, xl: 36 };
+
+/** Larger than a typical app: this is meant to be read at arm's length. */
+export const Type = {
+  caption: 14,
+  label: 17,
+  body: 18,
+  button: 20,
+  wisdom: 25,
+  title: 34,
+};

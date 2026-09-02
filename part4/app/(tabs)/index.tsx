@@ -1,98 +1,202 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
+import { apiUrl } from '@/lib/api';
 
-export default function HomeScreen() {
+type Tone = 'funny' | 'wise';
+
+const TONES: { value: Tone; label: string; hint: string }[] = [
+  { value: 'wise', label: 'Wise', hint: 'Something calm and genuinely useful' },
+  { value: 'funny', label: 'Funny', hint: 'Advice, right up until the last word' },
+];
+
+export default function WisdomScreen() {
+  const insets = useSafeAreaInsets();
+  const [tone, setTone] = useState<Tone>('wise');
+  const [wisdom, setWisdom] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function askGrandma() {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(apiUrl('/api/wisdom'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tone }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error ?? 'Request failed');
+      setWisdom(data.wisdom);
+    } catch {
+      // The route already logs the real cause server-side. Showing the raw
+      // error here would be noise to the reader and could echo server detail.
+      setError("Grandma couldn't be reached. Try again in a moment.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + Spacing.lg, paddingBottom: insets.bottom + Spacing.xl },
+      ]}>
+      <Text style={styles.title}>Grandma&apos;s Wisdom</Text>
+      <Text style={styles.subtitle}>of the day</Text>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <View style={styles.group} accessibilityRole="radiogroup">
+        {TONES.map(({ value, label, hint }) => {
+          const selected = tone === value;
+          return (
+            <Pressable
+              key={value}
+              onPress={() => setTone(value)}
+              disabled={loading}
+              accessibilityRole="radio"
+              accessibilityState={{ selected, disabled: loading }}
+              accessibilityLabel={`${label}. ${hint}`}
+              style={({ pressed }) => [
+                styles.radioRow,
+                selected && styles.radioRowSelected,
+                pressed && styles.pressed,
+              ]}>
+              <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
+                {selected ? <View style={styles.radioInner} /> : null}
+              </View>
+              <View style={styles.radioTextWrap}>
+                <Text style={styles.radioLabel}>{label}</Text>
+                <Text style={styles.radioHint}>{hint}</Text>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Pressable
+        onPress={askGrandma}
+        disabled={loading}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: loading, busy: loading }}
+        style={({ pressed }) => [
+          styles.button,
+          loading && styles.buttonDisabled,
+          pressed && !loading && styles.pressed,
+        ]}>
+        {loading ? (
+          <View style={styles.buttonBusy}>
+            <ActivityIndicator color={Palette.accentText} />
+            <Text style={styles.buttonText}>Grandma is thinking…</Text>
+          </View>
+        ) : (
+          <Text style={styles.buttonText}>Ask Grandma</Text>
+        )}
+      </Pressable>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      {wisdom ? (
+        <View style={styles.card}>
+          <Text style={styles.wisdom}>{wisdom}</Text>
+        </View>
+      ) : (
+        !error && <Text style={styles.empty}>Pick a mood and ask. She always has something.</Text>
+      )}
+
+      <Text style={styles.disclosure}>Wisdom is AI-generated.</Text>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  screen: { flex: 1, backgroundColor: Palette.background },
+  content: { paddingHorizontal: Spacing.lg, gap: Spacing.md },
+  title: {
+    fontSize: Type.title,
+    fontFamily: Fonts.serif,
+    color: Palette.text,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: Type.body,
+    color: Palette.textMuted,
+    textAlign: 'center',
+    marginTop: -Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  group: { gap: Spacing.sm },
+  radioRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.md,
+    padding: Spacing.md,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    backgroundColor: Palette.surface,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  radioRowSelected: { borderColor: Palette.accent, backgroundColor: Palette.accentSoft },
+  radioOuter: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: Palette.textMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  radioOuterSelected: { borderColor: Palette.accent },
+  radioInner: { width: 13, height: 13, borderRadius: 7, backgroundColor: Palette.accent },
+  radioTextWrap: { flex: 1 },
+  radioLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.text },
+  radioHint: { fontSize: Type.caption, color: Palette.textMuted, marginTop: 2 },
+  button: {
+    backgroundColor: Palette.accent,
+    borderRadius: 14,
+    paddingVertical: Spacing.md + 2,
+    alignItems: 'center',
+    marginTop: Spacing.xs,
+  },
+  buttonDisabled: { opacity: 0.75 },
+  buttonBusy: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  buttonText: { color: Palette.accentText, fontSize: Type.button, fontWeight: '600' },
+  pressed: { opacity: 0.85 },
+  card: {
+    backgroundColor: Palette.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    padding: Spacing.lg,
+  },
+  wisdom: {
+    fontSize: Type.wisdom,
+    lineHeight: Type.wisdom * 1.45,
+    fontFamily: Fonts.serif,
+    color: Palette.text,
+  },
+  empty: {
+    fontSize: Type.body,
+    color: Palette.textMuted,
+    textAlign: 'center',
+    paddingVertical: Spacing.lg,
+  },
+  error: { fontSize: Type.body, color: Palette.danger, textAlign: 'center' },
+  disclosure: {
+    fontSize: Type.caption,
+    color: Palette.textMuted,
+    textAlign: 'center',
+    marginTop: Spacing.xs,
   },
 });
