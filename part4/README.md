@@ -100,11 +100,25 @@ use the port actually in use.
 
 ```
 OPENROUTER_API_KEY=sk-or-v1-...
-OPENROUTER_MODEL=openai/gpt-4o-mini
+OPENROUTER_MODEL=google/gemini-2.5-flash
 ```
 
-`OPENROUTER_MODEL` is optional — the route falls back to a cheap default. Change
-it here to swap models without touching code. Note the deliberate absence of an
+`OPENROUTER_MODEL` is optional — the route falls back to the same default.
+Change it here to swap models without touching code, then **restart the dev
+server**: `.env` is read at startup, so an edit alone has no effect.
+
+Two things learned by measuring rather than guessing:
+
+- **The model was not the problem; the prompt was.** Early output tacked an
+  explanation onto every line ("...and you'll find joy in the journey"), which
+  is the clearest tell of a machine. The prompt had asked for "one or two short
+  sentences"; asking for exactly one, with examples of the target register and
+  an explicit ban on trailing `and`/`so`/`because` clauses, fixed it on the
+  original cheap model. Only then was a model comparison worth running.
+- **Reasoning models need far more `max_tokens`.** `openai/gpt-5-mini` returns
+  HTTP 200 with empty content at `max_tokens: 60`, having spent the whole
+  budget reasoning before writing a word. If you swap to a reasoning model,
+  raise the cap or you will get silent empty replies. Note the deliberate absence of an
 `EXPO_PUBLIC_` prefix on either: that prefix would inline the value into the app
 bundle, where anyone who installs the app can read it back out.
 
@@ -190,3 +204,18 @@ than in this repo, so it is not done until a credit limit exists on the key at
 
 Not attempted: the in-app model picker (the model is swappable via `.env`
 instead).
+
+## Choosing the model
+
+`google/gemini-2.5-flash` is the default, picked by running the same prompt
+through four models three times per tone:
+
+| Model | Verdict |
+| --- | --- |
+| `openai/gpt-4o-mini` | Workable, but reaches for tired templates |
+| `anthropic/claude-haiku-4.5` | Best funny lines; repeated a wise line verbatim |
+| `google/gemini-2.5-flash` | Strongest on both tones — **chosen** |
+| `openai/gpt-5-mini` | Unusable here: empty replies, see the note above |
+
+At roughly 350 tokens in and 30 out per call, Gemini 2.5 Flash costs about
+$0.00018 a call — around 5,500 taps per dollar.

@@ -40,3 +40,16 @@ rather than building it.
   AI output. It satisfies EU AI Act Article 50; do not move it behind a modal,
   a settings page, or a dismissable banner.
 - Commit messages describe what changed and why. Never "updates" or "fix stuff".
+
+## The prompt
+
+The wisdom must be ONE sentence with no explanation after it. A trailing
+clause ("...and you'll find joy in the journey") is what makes output read as
+machine-written, and it is the failure this prompt was rewritten to stop. If
+output starts explaining itself again, tighten the prompt before reaching for a
+different model — that is the order that worked.
+
+Tone examples in the prompt do real work; adjectives alone did not move the
+model. Do not name specific objects in the guidance, though: an earlier version
+listed "bread, rain, shoes, neighbours" as examples of concrete things and the
+model parroted them back in most replies.
