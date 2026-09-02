@@ -96,17 +96,22 @@ build log rather than a pile of "updates".
 
 ## Phase 5 — Security verification
 
-- [ ] Run `/security-review` in Claude Code. Confirm it reports **no major
-      flaws** — specifically no key in the bundle and no key in the repo.
-- [ ] Grep the working tree for the key prefix and for any secret behind an
-      `EXPO_PUBLIC_` name.
-- [ ] Scan the **full git history**, not just the current files:
+- [x] Run `/security-review` in Claude Code. Reported **no qualifying
+      vulnerabilities**; verified the key cannot reach the client by import,
+      `EXPO_PUBLIC_`, bundler inlining, or response/error echo. Its one nit
+      (`in` vs `Object.hasOwn` in the tone check) is fixed.
+- [x] Grepped the working tree: no key literal outside `.env`, and the only
+      `EXPO_PUBLIC_` mention is a comment forbidding it.
+- [x] Scanned the **full git history**, not just the current files — `.env` in
+      no commit, no `sk-or-*` in any blob, real key value absent everywhere:
       `git log --all -p -- .env` (must be empty) and
       `git grep -I "sk-or-v1" $(git rev-list --all)` (must find nothing).
-- [ ] Confirm the built bundle is clean: `npx expo export -p web`, then grep
-      `dist/` for the key. Nothing should match.
+- [x] Confirmed the built bundle is clean. `npx expo export -p web`, then
+      grepped all 21 files of `dist/client/` (what a phone downloads): the key
+      is absent and the string `OPENROUTER` appears zero times. The server
+      bundle reads `process.env` at runtime rather than baking the value in.
 - [ ] Set a **spending cap** on the OpenRouter key or account (optional task).
-- [ ] Record the results in `README.md`.
+- [x] Record the results in `README.md`.
 - [ ] Commit: `Verify no secrets in bundle or git history`
 
 ## Phase 6 — Finish

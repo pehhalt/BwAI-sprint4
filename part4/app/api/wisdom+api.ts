@@ -33,7 +33,10 @@ const TONE_PROMPTS = {
 type Tone = keyof typeof TONE_PROMPTS;
 
 function isTone(value: unknown): value is Tone {
-  return typeof value === 'string' && value in TONE_PROMPTS;
+  // hasOwn, not `in`: `in` walks the prototype chain, so "toString" and
+  // "constructor" would pass validation and fail later as a confusing 502
+  // instead of an honest 400.
+  return typeof value === 'string' && Object.hasOwn(TONE_PROMPTS, value);
 }
 
 export async function POST(request: Request) {

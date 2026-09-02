@@ -138,9 +138,28 @@ phone.**
   `git check-ignore -v .env`.
 - `CLAUDE.md` pins this rule so it survives future changes.
 
-Verified by running Claude Code's `/security-review` on the finished feature and
-a scan of the repo and its full git history for leaked secrets. See
-`CHECKLIST.md` for the results.
+### Verification
+
+An agent security review (Claude Code's `/security-review`) reported **no
+qualifying vulnerabilities**, having confirmed the key cannot reach the client
+by any path: direct import, `EXPO_PUBLIC_` prefix, bundler inlining, or being
+echoed in a response or error. It raised one non-security nit — `in` walking the
+prototype chain in the tone check — which is fixed.
+
+Alongside it, these checks were run and all came back clean:
+
+| Check | Result |
+| --- | --- |
+| `.env` in any commit, full history | Absent |
+| `sk-or-*` in any tracked blob, all refs | Absent |
+| The real key value across all history | Absent |
+| Key in the exported client bundle | Absent — `OPENROUTER` appears 0 times in `dist/client/` |
+| Key baked into the server bundle | No — reads `process.env` at runtime |
+| `EXPO_PUBLIC_` holding a secret | None |
+
+The bundle check is the one that matters most: `dist/client/` is exactly what a
+phone downloads, so a key absent from it is a key that cannot be extracted from
+the installed app.
 
 ## AI transparency
 
