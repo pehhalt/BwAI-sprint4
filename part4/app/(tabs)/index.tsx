@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
 import { apiUrl } from '@/lib/api';
+import { addEntry } from '@/lib/history';
 
 type Tone = 'funny' | 'wise';
 
@@ -38,6 +39,10 @@ export default function WisdomScreen() {
       const data = await response.json();
       if (!response.ok) throw new Error(data?.error ?? 'Request failed');
       setWisdom(data.wisdom);
+      // Saving is a convenience, not part of the result: addEntry swallows its
+      // own storage failures so a full disk cannot turn a good answer into an
+      // error on screen.
+      await addEntry(tone, data.wisdom);
     } catch {
       // The route already logs the real cause server-side. Showing the raw
       // error here would be noise to the reader and could echo server detail.
