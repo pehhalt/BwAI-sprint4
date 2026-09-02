@@ -12,6 +12,12 @@ leaves the server side.
 
 ---
 
+## What it looks like
+
+| Wisdom | History |
+| --- | --- |
+| <img src="docs/screenshots/wisdom.png" alt="The Wisdom screen: a Wise/Funny radio choice, an Ask Grandma button, and the AI-generated disclosure line" width="300"> | <img src="docs/screenshots/history.png" alt="The History screen: past wisdom listed newest first, each tagged with its mood and time" width="300"> |
+
 ## What it does
 
 Two screens, one AI feature.
