@@ -45,20 +45,23 @@ build log rather than a pile of "updates".
 
 - [x] Set `"web": { "output": "server" }` in `app.json` — API routes don't exist
       without it, and the template defaults to `"static"`.
-- [ ] Create `.env` with `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`.
-- [ ] Verify `.env` is ignored: `git status --short` must not list it, and
-      `git check-ignore -v .env` must confirm the rule.
-- [ ] Write `app/api/wisdom+api.ts`:
+- [x] Create `.env` with `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. Created
+      blank — **YOU still need to paste the real key in.**
+- [x] Verify `.env` is ignored: confirmed invisible to `git status` with the
+      real file present on disk.
+- [x] Write `app/api/wisdom+api.ts` (typechecks clean, not yet run):
       - `POST` handler reading `{ tone }` from the body
       - validates `tone` is `"funny"` or `"wise"` — rejects anything else with 400
       - reads the key from `process.env`, returns a clear 500 if it's missing
       - calls `https://openrouter.ai/api/v1/chat/completions`
       - returns `{ wisdom }`, or a clean JSON error
-- [ ] Test the route without the app. **Check the port Expo actually printed** —
-      it falls through to 8082 (or higher) whenever 8081 is taken, and a request
-      to the wrong port fails in a way that looks exactly like a broken route:
-      `curl -X POST http://localhost:8081/api/wisdom -H "Content-Type: application/json" -d '{"tone":"wise"}'`
-- [ ] Commit: `Add OpenRouter API route for wisdom generation`
+- [x] Test the route without the app. Verified on port 8081: invalid tone → 400,
+      malformed body → 400, `wise` → 200, `funny` → 200 and audibly different.
+      Confirmed the key appears in neither success nor error responses.
+      **Check the port Expo actually printed** — it falls through to 8082 or
+      higher whenever 8081 is taken, and a request to the wrong port fails in a
+      way that looks exactly like a broken route.
+- [x] Commit: `Add OpenRouter API route for wisdom generation`
 
 ## Phase 3 — The wisdom screen
 
