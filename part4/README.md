@@ -118,9 +118,11 @@ Two things learned by measuring rather than guessing:
 - **Reasoning models need far more `max_tokens`.** `openai/gpt-5-mini` returns
   HTTP 200 with empty content at `max_tokens: 60`, having spent the whole
   budget reasoning before writing a word. If you swap to a reasoning model,
-  raise the cap or you will get silent empty replies. Note the deliberate absence of an
-`EXPO_PUBLIC_` prefix on either: that prefix would inline the value into the app
-bundle, where anyone who installs the app can read it back out.
+  raise the cap or you will get silent empty replies.
+
+Note the deliberate absence of an `EXPO_PUBLIC_` prefix on either variable.
+That prefix would inline the value into the app bundle, where anyone who
+installs the app could read it back out.
 
 ### If the phone won't connect
 
@@ -134,10 +136,11 @@ From the mobile taster lesson, in order:
    target iPhone's Expo Go supports. If Expo Go says the project is
    incompatible, the pin is wrong for your device, not the app.
 
-If the app loads but the AI call fails on device while `curl` against
-`localhost:8081/api/wisdom` works, the relative `fetch('/api/wisdom')` isn't
-resolving to the dev server. Build an absolute URL from
-`Constants.expoConfig.hostUri` instead.
+If the app loads but the AI call fails on device while `curl` against the dev
+server works, check the port first — Expo falls through to 8082 or higher when
+8081 is taken, and the phone will be pointed at whichever one Expo printed.
+`lib/api.ts` already builds an absolute URL from `Constants.expoConfig.hostUri`,
+so a relative-fetch problem is not the cause.
 
 ## Security
 
@@ -218,8 +221,73 @@ Outstanding: the **spending cap**. It is set in the OpenRouter dashboard rather
 than in this repo, so it is not done until a credit limit exists on the key at
 [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys).
 
+**Treat that cap as necessary rather than optional.** `/api/wisdom` has no
+authentication, and the Expo dev server binds every interface — so anyone on
+the same Wi-Fi can POST to it and spend your OpenRouter credit, in a loop if
+they like. Tunnel mode (`npx expo start --tunnel`) puts the same endpoint on
+the public internet. Adding auth is out of scope for a local preview; the cap
+is what bounds the damage.
+
 Not attempted: the in-app model picker (the model is swappable via `.env`
 instead).
+
+## Reviews
+
+Three independent reviews were run over the finished app. All findings were
+acted on; the list below records what each one caught, including the things it
+caught in this README.
+
+### Security review — clean
+
+No qualifying vulnerabilities. It confirmed, with line citations, that the key
+cannot reach the client by any path: it is read once inside the `+api.ts` route
+(which Metro excludes from the client graph), no `EXPO_PUBLIC_` secret exists so
+bundler inlining cannot apply, no client module imports the route, and every
+failure path returns a fixed string with the upstream error body going only to
+the server log. It also confirmed `lib/history.ts` does no object merge, spread
+or `JSON.parse` reviver, so stored data cannot become a prototype-pollution
+gadget.
+
+### EU AI Act audit — Limited risk, one failure found and fixed
+
+Classified as **limited risk (transparency-only)**: not prohibited under
+Article 5, and outside every Annex III high-risk domain, since the output is a
+one-line aphorism attached to no decision, score or eligibility outcome.
+
+It found a real failure. The History screen's disclosure was a
+`ListFooterComponent`, which renders *after* the last row — so with history
+capped at 100 entries, a reader could scroll past dozens of machine-written
+lines and never reach the label. The disclosure existed but did nothing on that
+screen. Both screens now place it above the output, each history row announces
+itself as AI-generated to a screen reader, and the disclosure has an accessible
+colour. It also caught three overstatements in these docs, all corrected.
+
+### Code review — 11 findings, all fixed
+
+The two that mattered most:
+
+- **The error handler hid the most likely first-run failure.** A missing key
+  returns a clear 500 saying so, but the screen discarded it and showed
+  "Grandma couldn't be reached. Try again in a moment." — sending a user who
+  forgot to paste their key into an endless retry. Server-supplied errors are
+  now shown; the generic line is kept only for genuine network failures.
+- **The contrast fix had been applied to one label out of five.** `textMuted`
+  measured 3.78:1 and was also the colour of the subtitle, empty state, radio
+  hints and history timestamps. It is now 5.89:1, so the whole secondary type
+  scale passes AA rather than just the disclosure.
+
+The rest: the root layout still followed the system colour scheme in a
+light-only app, which put white status-bar glyphs on a permanently cream
+background; `app.json` still carried the template's blue and black launch
+colours; a failed request left the previous answer on screen beneath the error;
+`Alert.alert` is a no-op on web, so Clear silently did nothing there; the
+disclosure I had just moved was labelling an empty history list; and eight
+template files formed an unreachable island, now deleted along with the
+light/dark `Colors` table they used.
+
+`expo-image`, `expo-web-browser` and `expo-font` are left installed despite
+being unused by app code — pruning SDK packages risks breaking autolinking for
+no benefit here.
 
 ## Choosing the model
 

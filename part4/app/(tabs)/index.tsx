@@ -27,26 +27,39 @@ export default function WisdomScreen() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const UNREACHABLE = "Grandma couldn't be reached. Try again in a moment.";
+
   async function askGrandma() {
     setLoading(true);
     setError(null);
+    // Clear the old answer up front, so a failure never leaves the previous
+    // wisdom sitting under an error message as though it were the new one.
+    setWisdom(null);
     try {
       const response = await fetch(apiUrl('/api/wisdom'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tone }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error ?? 'Request failed');
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        // Show what the server actually said. Its error strings are written
+        // for a reader and carry no key or account detail by design, and the
+        // likeliest first-run failure -- a missing key -- needs a setup fix,
+        // not the retry that a generic "couldn't be reached" invites.
+        setError(data?.error ?? UNREACHABLE);
+        return;
+      }
+
       setWisdom(data.wisdom);
       // Saving is a convenience, not part of the result: addEntry swallows its
       // own storage failures so a full disk cannot turn a good answer into an
       // error on screen.
       await addEntry(tone, data.wisdom);
     } catch {
-      // The route already logs the real cause server-side. Showing the raw
-      // error here would be noise to the reader and could echo server detail.
-      setError("Grandma couldn't be reached. Try again in a moment.");
+      // Genuine network or parse failure: there is no server message to show.
+      setError(UNREACHABLE);
     } finally {
       setLoading(false);
     }

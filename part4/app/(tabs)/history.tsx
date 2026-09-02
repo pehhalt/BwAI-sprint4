@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
@@ -33,17 +33,22 @@ export default function HistoryScreen() {
     }, [])
   );
 
+  async function doClear() {
+    await clearHistory();
+    setEntries([]);
+  }
+
   function confirmClear() {
+    const message = 'Clear history? This removes every saved piece of wisdom.';
+    // Alert.alert is a no-op on react-native-web, so on web the button would
+    // silently do nothing at all.
+    if (Platform.OS === 'web') {
+      if (window.confirm(message)) void doClear();
+      return;
+    }
     Alert.alert('Clear history?', 'This removes every saved piece of wisdom.', [
       { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Clear',
-        style: 'destructive',
-        onPress: async () => {
-          await clearHistory();
-          setEntries([]);
-        },
-      },
+      { text: 'Clear', style: 'destructive', onPress: () => void doClear() },
     ]);
   }
 
@@ -67,9 +72,11 @@ export default function HistoryScreen() {
         after the last row, so a reader could scroll dozens of AI-generated
         entries and never reach the label -- which defeats the point of it.
       */}
-      <Text style={styles.disclosure} accessibilityRole="text">
-        Wisdom is AI-generated.
-      </Text>
+      {entries.length > 0 && (
+        <Text style={styles.disclosure} accessibilityRole="text">
+          Wisdom is AI-generated.
+        </Text>
+      )}
 
       <FlatList
         data={entries}

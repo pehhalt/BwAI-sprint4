@@ -1,31 +1,11 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Design tokens. The light/dark `Colors` table the Expo template ships was
+ * removed with the unused components that consumed it -- this app commits to
+ * one light palette, and leaving a dark table around invites a change back to
+ * system theming that CLAUDE.md rules out.
  */
 
 import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-};
 
 export const Fonts = Platform.select({
   ios: {
@@ -66,10 +46,10 @@ export const Palette = {
   surface: '#FFFDF8',
   border: '#E7DCC6',
   text: '#3E2F23', // deep warm brown
-  textMuted: '#8A7A69',
-  // The AI disclosure gets its own token: textMuted is only 3.78:1 on the
-  // background, under the 4.5:1 WCAG AA floor. A transparency notice must
-  // not be the least legible text on the screen. This is 6.5:1.
+  textMuted: '#6E5B49', // 5.89:1 on background, 6.35:1 on surface
+  // Secondary text sits at 5.89:1 and the disclosure a shade darker at 6.5:1.
+  // The previous #8A7A69 measured 3.78:1, under the 4.5:1 WCAG AA floor -- and
+  // it was used for subtitles, hints and timestamps, not just this line.
   disclosure: '#665545',
   accent: '#6E8B6A', // sage
   accentText: '#FFFFFF',

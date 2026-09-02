@@ -114,7 +114,10 @@ build log rather than a pile of "updates".
       grepped all 21 files of `dist/client/` (what a phone downloads): the key
       is absent and the string `OPENROUTER` appears zero times. The server
       bundle reads `process.env` at runtime rather than baking the value in.
-- [ ] Set a **spending cap** on the OpenRouter key or account (optional task).
+- [ ] Set a **spending cap** on the OpenRouter key or account. Listed as
+      optional by the brief, but treat it as necessary: `/api/wisdom` has no
+      auth and the dev server binds every interface, so anyone on the same
+      Wi-Fi can spend your credit — and `--tunnel` exposes it publicly.
 - [x] Record the results in `README.md`.
 - [x] Commit: `Verify no secrets in bundle or git history`
 
@@ -132,6 +135,18 @@ build log rather than a pile of "updates".
       prompt, three samples per tone. `google/gemini-2.5-flash` won.
 
 ---
+
+## Post-build reviews
+
+- [x] **Security review** — no qualifying vulnerabilities, re-run over the
+      final state including the prompt rewrite and model switch.
+- [x] **EU AI Act audit** — limited risk. Found the History disclosure rendered
+      after up to 100 entries as a list footer; fixed on both screens.
+- [x] **Code review** (high effort) — 11 findings, all fixed. The important two:
+      the error handler hid a missing-key setup failure behind a retry message,
+      and the WCAG fix had been applied to one label out of five.
+
+Outcomes recorded in `README.md` under "Reviews".
 
 ## Review checklist (the graded one)
 
