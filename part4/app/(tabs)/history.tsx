@@ -1,6 +1,7 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
@@ -17,6 +18,7 @@ function formatWhen(timestamp: number): string {
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const [entries, setEntries] = useState<WisdomEntry[]>([]);
 
   // Re-read on focus: new wisdom is generated on the other tab, so this screen
@@ -53,7 +55,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + Spacing.lg }]}>
+    <View style={[styles.screen, { paddingTop: insets.top + Spacing.md }]}>
       <View style={styles.header}>
         <Text style={styles.title}>History</Text>
         {entries.length > 0 && (
@@ -83,7 +85,9 @@ export default function HistoryScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[
           styles.list,
-          { paddingBottom: insets.bottom + Spacing.xl },
+          // The tab bar is taller than the bottom safe-area inset, so padding
+          // by the inset alone leaves the last card partly underneath it.
+          { paddingBottom: tabBarHeight + Spacing.lg },
           entries.length === 0 && styles.listEmpty,
         ]}
         ListEmptyComponent={

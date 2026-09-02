@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
@@ -16,12 +17,13 @@ import { addEntry } from '@/lib/history';
 type Tone = 'funny' | 'wise';
 
 const TONES: { value: Tone; label: string; hint: string }[] = [
-  { value: 'wise', label: 'Wise', hint: 'Something calm and genuinely useful' },
-  { value: 'funny', label: 'Funny', hint: 'Advice, right up until the last word' },
+  { value: 'wise', label: 'Wise', hint: 'Calm and useful' },
+  { value: 'funny', label: 'Funny', hint: 'With a twist' },
 ];
 
 export default function WisdomScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const [tone, setTone] = useState<Tone>('wise');
   const [wisdom, setWisdom] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,9 +72,11 @@ export default function WisdomScreen() {
       style={styles.screen}
       contentContainerStyle={[
         styles.content,
-        { paddingTop: insets.top + Spacing.lg, paddingBottom: insets.bottom + Spacing.xl },
+        { paddingTop: insets.top + Spacing.md, paddingBottom: tabBarHeight + Spacing.lg },
       ]}>
-      <Text style={styles.title}>Grandma&apos;s Wisdom</Text>
+      <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
+        Grandma&apos;s Wisdom
+      </Text>
       <Text style={styles.subtitle}>of the day</Text>
 
       <View style={styles.group} accessibilityRole="radiogroup">
@@ -147,9 +151,10 @@ export default function WisdomScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
-  content: { paddingHorizontal: Spacing.lg, gap: Spacing.md },
+  content: { paddingHorizontal: Spacing.lg, gap: Spacing.sm },
   title: {
     fontSize: Type.title,
+    lineHeight: Type.title * 1.15,
     fontFamily: Fonts.serif,
     color: Palette.text,
     textAlign: 'center',
@@ -158,15 +163,16 @@ const styles = StyleSheet.create({
     fontSize: Type.body,
     color: Palette.textMuted,
     textAlign: 'center',
-    marginTop: -Spacing.sm,
-    marginBottom: Spacing.sm,
+    marginTop: -Spacing.xs,
+    marginBottom: Spacing.xs,
   },
   group: { gap: Spacing.sm },
   radioRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    padding: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: Palette.border,
@@ -190,7 +196,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: Palette.accent,
     borderRadius: 14,
-    paddingVertical: Spacing.md + 2,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
     marginTop: Spacing.xs,
   },
