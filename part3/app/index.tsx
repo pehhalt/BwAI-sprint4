@@ -20,7 +20,7 @@ const ACCENT_TEXT = '#2A1B06';
 
 const TILT_MS = 40; // initial tip, before the wobble
 const WOBBLE_MS = 70; // one swing, left to right
-const WOBBLE_SWINGS = 6; // must stay even so the die ends tipped, ready to settle
+const WOBBLE_SWINGS = 6; // must stay even so the dice ends tipped, ready to settle
 const SETTLE_MS = 140; // easing back to level
 const ROLL_MS = TILT_MS + WOBBLE_MS * WOBBLE_SWINGS + SETTLE_MS; // 600ms
 const TUMBLE_MS = 70; // how often the face flips while shaking
@@ -83,7 +83,7 @@ export default function RollADice() {
     };
   }, []);
 
-  const dieStyle = useAnimatedStyle(() => ({
+  const diceStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${wobble.get() * WOBBLE_DEG}deg` }, { scale: pressScale.get() }],
   }));
 
@@ -144,7 +144,7 @@ export default function RollADice() {
           accessibilityRole="button"
           accessibilityLabel={`Dice colour: ${color.name}`}
           accessibilityHint="Tap to change the dice colour">
-          <Animated.View style={[styles.die, { backgroundColor: color.face }, dieStyle]}>
+          <Animated.View style={[styles.dice, { backgroundColor: color.face }, diceStyle]}>
             {PIP_GRID[value].map((filled, i) => (
               <View key={i} style={styles.cell}>
                 {filled ? <View style={[styles.pip, { backgroundColor: color.pip }]} /> : null}
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
-  die: {
+  dice: {
     width: 210,
     height: 210,
     borderRadius: 36,

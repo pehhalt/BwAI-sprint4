@@ -17,6 +17,6 @@ earlier project and notes on reusing them across the whole tree.
 
 ## [part3](./part3) — Roll a Dice
 
-A single-screen Expo mobile app: roll a die with a button, tap the die to recolour it.
+A single-screen Expo mobile app: roll a dice with a button, tap the dice to recolour it.
 Runs on iOS, Android and the web. See [part3/README.md](./part3/README.md) — note it is
 **pinned to Expo SDK 54 on purpose**, because Expo Go on the App Store is pinned there too.

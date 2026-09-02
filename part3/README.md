@@ -1,15 +1,15 @@
 # Roll a Dice 🎲
 
-A single-screen Expo app: a die you roll with a button and recolour by tapping it.
+A single-screen Expo app: a dice you roll with a button and recolour by tapping it.
 Built for the "build and preview a small mobile app" lab.
 
 ## What it does
 
-- **Roll** — tap the button and the die shakes for 600ms, tumbling through faces before
+- **Roll** — tap the button and the dice shakes for 600ms, tumbling through faces before
   settling on a result. A counter underneath tracks how many times you've rolled.
-- **Recolour** — tap the die itself to step through white → yellow → red → green → blue
+- **Recolour** — tap the dice itself to step through white → yellow → red → green → blue
   and back. It stays on whichever colour you leave it on; rolling never resets it.
-- Works on iOS, Android and the web from the same code — the die and its pips are plain
+- Works on iOS, Android and the web from the same code — the dice and its pips are plain
   `View`s, so there are no image assets to go missing.
 
 ## Running it
@@ -62,7 +62,7 @@ empty cell.
 
 **Roll timing** — `ROLL_MS` is *derived* from its parts (`TILT_MS + WOBBLE_MS ×
 WOBBLE_SWINGS + SETTLE_MS`), so the shake animation and the `setTimeout` that lands the
-result can't drift apart when you retune it. Keep `WOBBLE_SWINGS` even, or the die settles
+result can't drift apart when you retune it. Keep `WOBBLE_SWINGS` even, or the dice settles
 from the wrong side.
 
 **Fair vs. lively** — two different random functions on purpose. `differentFace()` drives
