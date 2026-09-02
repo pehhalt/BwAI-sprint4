@@ -62,6 +62,15 @@ export default function HistoryScreen() {
         )}
       </View>
 
+      {/*
+        Fixed above the list, never a ListFooterComponent. A footer renders
+        after the last row, so a reader could scroll dozens of AI-generated
+        entries and never reach the label -- which defeats the point of it.
+      */}
+      <Text style={styles.disclosure} accessibilityRole="text">
+        Wisdom is AI-generated.
+      </Text>
+
       <FlatList
         data={entries}
         keyExtractor={(item) => item.id}
@@ -73,13 +82,11 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           <Text style={styles.empty}>No wisdom yet. Go ask Grandma.</Text>
         }
-        ListFooterComponent={
-          entries.length > 0 ? (
-            <Text style={styles.disclosure}>Wisdom is AI-generated.</Text>
-          ) : null
-        }
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View
+            style={styles.card}
+            accessible
+            accessibilityLabel={`AI-generated ${item.tone} wisdom: ${item.text}`}>
             <Text style={styles.wisdom}>{item.text}</Text>
             <View style={styles.meta}>
               <Text style={[styles.tone, item.tone === 'funny' && styles.toneFunny]}>
@@ -142,8 +149,8 @@ const styles = StyleSheet.create({
   when: { fontSize: Type.caption, color: Palette.textMuted },
   disclosure: {
     fontSize: Type.caption,
-    color: Palette.textMuted,
-    textAlign: 'center',
-    paddingTop: Spacing.sm,
+    color: Palette.disclosure,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
 });

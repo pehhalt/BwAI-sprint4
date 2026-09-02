@@ -8,6 +8,11 @@ export type WisdomEntry = {
   tone: 'funny' | 'wise';
   text: string;
   createdAt: number;
+  /**
+   * Marks the stored text as machine-written. Optional on read so entries
+   * saved before this field existed still load, always written going forward.
+   */
+  aiGenerated?: boolean;
 };
 
 function isEntry(value: unknown): value is WisdomEntry {
@@ -49,6 +54,7 @@ export async function addEntry(
     tone,
     text,
     createdAt: Date.now(),
+    aiGenerated: true,
   };
   const next = [entry, ...(await readHistory())].slice(0, MAX_ENTRIES);
   try {

@@ -67,6 +67,10 @@ export const Palette = {
   border: '#E7DCC6',
   text: '#3E2F23', // deep warm brown
   textMuted: '#8A7A69',
+  // The AI disclosure gets its own token: textMuted is only 3.78:1 on the
+  // background, under the 4.5:1 WCAG AA floor. A transparency notice must
+  // not be the least legible text on the screen. This is 6.5:1.
+  disclosure: '#665545',
   accent: '#6E8B6A', // sage
   accentText: '#FFFFFF',
   accentSoft: '#EAF0E8',

@@ -178,13 +178,29 @@ the installed app.
 
 ## AI transparency
 
-The app shows this line directly under every piece of wisdom:
+Both screens that show AI output carry this line:
 
 > Wisdom is AI-generated.
 
-That is the visible-disclosure side of the **EU AI Act, Article 50** duty to
-label AI-generated content. One sentence, always on screen, never behind a
-modal or a settings page.
+It sits **above** the output on each, not below it. That ordering is
+deliberate: a label placed after the thing it labels can be scrolled past
+unseen, and on the History screen it originally was — it had been a
+`ListFooterComponent`, rendering after up to 100 generated entries. A
+compliance audit caught that; it is now fixed in the screen header, visible
+before any entry. Each history row also announces itself as AI-generated to a
+screen reader, so a VoiceOver user swiping row by row hears it every time
+rather than once.
+
+The line is never behind a modal or a settings page, and it renders whether or
+not any wisdom has been generated yet.
+
+This addresses the **visible-disclosure** side of the **EU AI Act, Article 50**
+duty. The other side, machine-readable marking of synthetic content under
+Article 50(2), falls on the provider of the model rather than on a deployer
+calling it — so it is not addressed here beyond an `aiGenerated: true` field on
+the API response and each stored entry, which is a cheap hedge rather than a
+claim of compliance. If this route were ever deployed publicly under its own
+name, that question would need revisiting.
 
 ## Optional tasks completed
 

@@ -88,6 +88,10 @@ build log rather than a pile of "updates".
 - [x] `app/(tabs)/history.tsx` — `FlatList`, newest first, each row showing the
       wisdom, its mood, and a readable timestamp.
 - [x] Empty state: "No wisdom yet. Go ask Grandma."
+- [x] **Disclosure on this screen too.** Every surface rendering AI output needs
+      its own label, above the output. Missed on the first pass — it went in as
+      a `ListFooterComponent`, after up to 100 entries, and an EU AI Act audit
+      caught it.
 - [x] Rename the template's `explore` tab to `history`: rename
       `app/(tabs)/explore.tsx`, and update the second `<Tabs.Screen>` in
       `app/(tabs)/_layout.tsx` (name, title, icon). Delete `app/modal.tsx` and

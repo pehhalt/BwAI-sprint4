@@ -112,6 +112,15 @@ export default function WisdomScreen() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
+      {/*
+        Above the card, not below it: a label that follows the content it
+        labels can be scrolled past unseen. EU AI Act Article 50 asks for
+        disclosure at or before the interaction, so it reads first.
+      */}
+      <Text style={styles.disclosure} accessibilityRole="text">
+        Wisdom is AI-generated.
+      </Text>
+
       {wisdom ? (
         <View style={styles.card}>
           <Text style={styles.wisdom}>{wisdom}</Text>
@@ -119,8 +128,6 @@ export default function WisdomScreen() {
       ) : (
         !error && <Text style={styles.empty}>Pick a mood and ask. She always has something.</Text>
       )}
-
-      <Text style={styles.disclosure}>Wisdom is AI-generated.</Text>
     </ScrollView>
   );
 }
@@ -200,8 +207,7 @@ const styles = StyleSheet.create({
   error: { fontSize: Type.body, color: Palette.danger, textAlign: 'center' },
   disclosure: {
     fontSize: Type.caption,
-    color: Palette.textMuted,
+    color: Palette.disclosure,
     textAlign: 'center',
-    marginTop: Spacing.xs,
   },
 });

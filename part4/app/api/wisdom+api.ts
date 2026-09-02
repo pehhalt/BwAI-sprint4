@@ -124,7 +124,11 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Grandma had nothing to say.' }, { status: 502 });
     }
 
-    return Response.json({ wisdom: wisdom.trim(), tone });
+    // aiGenerated marks the payload as synthetic for any consumer that is not
+    // a human reading the screen. Article 50(2) machine-readable marking sits
+    // with the model provider rather than a deployer, so this is a hedge, not
+    // a claim of compliance -- but it costs nothing and travels with the text.
+    return Response.json({ wisdom: wisdom.trim(), tone, aiGenerated: true });
   } catch (error) {
     console.error('[wisdom] Request to OpenRouter failed:', error);
     return Response.json({ error: "Grandma couldn't be reached." }, { status: 502 });
