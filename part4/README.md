@@ -65,6 +65,7 @@ app/
 constants/
   theme.ts             colours, spacing, type scale
 lib/
+  api.ts               builds the dev-server URL for the phone to call
   history.ts           AsyncStorage read/write helpers
 .env                   your key (git-ignored, never committed)
 .env.example           the shape of .env, with no real values
@@ -179,10 +180,13 @@ modal or a settings page.
   is in flight, so the screen never looks frozen.
 - **History screen** — a second screen listing every answer generated so far,
   persisted locally with AsyncStorage.
-- **Spending cap** — a credit limit set on the OpenRouter key so a burst of use
-  can't run up the bill.
 - **Secret-leak scan** — repo and full git history scanned to confirm the key
-  was never committed.
+  was never committed, plus the exported bundle checked directly. Results in
+  the Verification table above.
+
+Outstanding: the **spending cap**. It is set in the OpenRouter dashboard rather
+than in this repo, so it is not done until a credit limit exists on the key at
+[openrouter.ai/settings/keys](https://openrouter.ai/settings/keys).
 
 Not attempted: the in-app model picker (the model is swappable via `.env`
 instead).
