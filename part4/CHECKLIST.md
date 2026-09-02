@@ -114,10 +114,12 @@ build log rather than a pile of "updates".
       grepped all 21 files of `dist/client/` (what a phone downloads): the key
       is absent and the string `OPENROUTER` appears zero times. The server
       bundle reads `process.env` at runtime rather than baking the value in.
-- [ ] Set a **spending cap** on the OpenRouter key or account. Listed as
-      optional by the brief, but treat it as necessary: `/api/wisdom` has no
-      auth and the dev server binds every interface, so anyone on the same
-      Wi-Fi can spend your credit — and `--tunnel` exposes it publicly.
+- [x] Set a **spending cap** on the OpenRouter key or account — **$1 per week**.
+      Listed as optional by the brief, but treated as necessary: `/api/wisdom`
+      has no auth and the dev server binds every interface, so anyone on the
+      same Wi-Fi can spend the credit — and `--tunnel` exposes it publicly. The
+      cap is what bounds that. At roughly $0.00018 a call it still allows about
+      5,500 taps a week, far past any real use of this app.
 - [x] Record the results in `README.md`.
 - [x] Commit: `Verify no secrets in bundle or git history`
 

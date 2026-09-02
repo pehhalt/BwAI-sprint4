@@ -216,17 +216,15 @@ name, that question would need revisiting.
 - **Secret-leak scan** — repo and full git history scanned to confirm the key
   was never committed, plus the exported bundle checked directly. Results in
   the Verification table above.
+- **Spending cap** — **$1 per week** on the OpenRouter key.
 
-Outstanding: the **spending cap**. It is set in the OpenRouter dashboard rather
-than in this repo, so it is not done until a credit limit exists on the key at
-[openrouter.ai/settings/keys](https://openrouter.ai/settings/keys).
-
-**Treat that cap as necessary rather than optional.** `/api/wisdom` has no
-authentication, and the Expo dev server binds every interface — so anyone on
-the same Wi-Fi can POST to it and spend your OpenRouter credit, in a loop if
-they like. Tunnel mode (`npx expo start --tunnel`) puts the same endpoint on
-the public internet. Adding auth is out of scope for a local preview; the cap
-is what bounds the damage.
+That cap is necessary rather than optional. `/api/wisdom` has no
+authentication, and the Expo dev server binds every interface, so anyone on the
+same Wi-Fi can POST to it and spend the credit, in a loop if they like. Tunnel
+mode (`npx expo start --tunnel`) puts the same endpoint on the public internet.
+Adding auth is out of scope for a local preview, so the cap is what bounds the
+damage. At roughly $0.00018 a call it still allows about 5,500 taps a week —
+well past any genuine use, while capping a runaway at pocket change.
 
 Not attempted: the in-app model picker (the model is swappable via `.env`
 instead).
