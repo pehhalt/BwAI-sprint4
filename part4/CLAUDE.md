@@ -15,13 +15,18 @@ there can be copied and used to run up charges. If a change would require the
 app to hold the key, the change is wrong — move the call to the server route
 instead.
 
-## The SDK pin (non-negotiable)
+## The SDK
 
-- This project is pinned to **Expo SDK 54**. The target iPhone's Expo Go cannot
-  load a newer SDK, so an upgrade makes the app unopenable on the only device it
-  is meant to run on. Never run `npx expo install --fix`, `expo upgrade`, or
-  `expo@latest`. If a package needs a version bump, pin it to the SDK 54
-  compatible release instead.
+- This project runs on **Expo SDK 57**, because that is what the App Store build
+  of Expo Go requires.
+- **Expo Go only ever supports the newest SDK, and it is not backward
+  compatible.** It updates itself, and when it does, an older project stops
+  opening. So the SDK is not a preference to be pinned — it tracks whatever Expo
+  Go currently needs.
+- This project was previously pinned to SDK 54 with a rule saying never to
+  upgrade. Expo Go updated to 57 and that rule became the thing breaking the
+  app. If Expo Go refuses to open the project again, upgrade rather than
+  looking for a way to hold the old version.
 
 ## Scope
 

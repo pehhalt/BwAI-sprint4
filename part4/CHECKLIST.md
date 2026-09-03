@@ -32,9 +32,10 @@ build log rather than a pile of "updates".
       (`part4`) to `Grandma's Wisdom` / `grandmas-wisdom`.
 - [x] Add `.env.example`.
 - [x] **Starter confirmed on the iPhone via Expo Go**, dev server on port 8082.
-- ⚠️ **Standing rule — never bump the SDK.** `npx expo install --fix` and any upgrade advice
-      will try to move this to the latest SDK, which breaks Expo Go on the
-      target iPhone. The pin at 54 is a device constraint, not a default.
+- ⚠️ **Standing rule — the SDK follows Expo Go, not the other way round.**
+      Expo Go supports only the newest SDK and updates itself. This was pinned
+      at 54; Expo Go moved to 57 and the app stopped opening, so it was upgraded
+      (see Phase 7). Expect to repeat that when Expo Go next updates.
 - [x] Connected first try, no firewall or tunnel workarounds needed. Fix list in `README.md` (network Private →
       Node.js through firewall → `--tunnel` → pin the SDK). Don't fight it;
       tunnel mode is a fine answer.
@@ -137,6 +138,25 @@ build log rather than a pile of "updates".
       prompt, three samples per tone. `google/gemini-2.5-flash` won.
 
 ---
+
+## Phase 7 — SDK upgrade, forced by Expo Go (4 Sep 2026)
+
+- [x] Expo Go updated on the App Store and now requires **SDK 57**, so the
+      SDK 54 build would no longer open. Not a code fault; Expo Go supports only
+      the newest SDK and is not backward compatible.
+- [x] `npx expo install expo@latest` then `npx expo install --fix` — SDK 57,
+      React 19.2.3, React Native 0.86.3.
+- [x] Migrate the React Navigation entry points, which SDK 56 moved into
+      `expo-router`: `ThemeProvider` in `app/_layout.tsx`, and
+      `BottomTabBarButtonProps` / `PlatformPressable` in `components/haptic-tab.tsx`.
+- [x] Fix `components/ui/icon-symbol.tsx`: `expo-symbols` widened its `name`
+      type to allow a per-platform object, which can no longer key a Record.
+- [x] Drop `newArchEnabled` and `android.edgeToEdgeEnabled` from `app.json` —
+      both are defaults in SDK 57 and no longer valid keys.
+- [x] `expo-doctor` 21/21, `tsc` clean, `expo lint` clean.
+- [ ] **YOU: restart the dev server and confirm the app opens in the updated
+      Expo Go.** A three-version SDK jump changes the native runtime, so a green
+      typecheck proves very little here.
 
 ## Post-build reviews
 

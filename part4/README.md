@@ -55,9 +55,10 @@ is out of scope here.
 
 ## Project layout
 
-**Expo SDK 54, pinned deliberately** — that is the newest SDK the target
-iPhone's Expo Go can load. Do not upgrade it; a newer SDK makes the app
-unopenable on that device.
+**Expo SDK 57.** Expo Go supports only the newest SDK and is not backward
+compatible, so the project's SDK tracks whatever the current App Store build of
+Expo Go requires. It was built on SDK 54; Expo Go updated to 57 and the app
+stopped opening until it was upgraded. Expect to do that again.
 
 ```
 app/
@@ -138,9 +139,10 @@ From the mobile taster lesson, in order:
 2. Allow **Node.js** through the Windows Defender firewall (both private and
    public).
 3. Fall back to tunnel mode: `npx expo start --tunnel`.
-4. Check the SDK. This project is pinned to **SDK 54** because that is what the
-   target iPhone's Expo Go supports. If Expo Go says the project is
-   incompatible, the pin is wrong for your device, not the app.
+4. Check the SDK. If Expo Go refuses to open the project, it has probably
+   updated past the project's SDK — Expo Go only supports the newest one. Run
+   `npx expo install expo@latest && npx expo install --fix`, then
+   `npx expo-doctor`. That is a real upgrade, not a workaround.
 
 If the app loads but the AI call fails on device while `curl` against the dev
 server works, check the port first — Expo falls through to 8082 or higher when
