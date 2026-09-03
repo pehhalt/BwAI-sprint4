@@ -154,9 +154,11 @@ build log rather than a pile of "updates".
 - [x] Drop `newArchEnabled` and `android.edgeToEdgeEnabled` from `app.json` —
       both are defaults in SDK 57 and no longer valid keys.
 - [x] `expo-doctor` 21/21, `tsc` clean, `expo lint` clean.
-- [ ] **YOU: restart the dev server and confirm the app opens in the updated
-      Expo Go.** A three-version SDK jump changes the native runtime, so a green
-      typecheck proves very little here.
+- [x] **Confirmed on the device** in the updated Expo Go.
+- [x] Expo Go now requires being signed in. `npx expo login` on the laptop
+      **and** the same account signed in inside the Expo Go app — the CLI login
+      alone is not enough. Log in before starting the dev server; the manifest
+      is built at startup, so logging in afterwards means restarting anyway.
 
 ## Post-build reviews
 

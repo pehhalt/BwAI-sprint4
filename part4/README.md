@@ -89,8 +89,17 @@ with a few dollars of credit (~$5 is plenty).
 ```bash
 npm install
 cp .env.example .env     # then paste your key into .env
+npx expo login           # required: see below
 npx expo start
 ```
+
+**You must be signed in, in two places.** Current Expo Go refuses to open the
+project otherwise, with "there was a problem running the request". Run
+`npx expo login` on the laptop *and* sign in to the Expo Go app on the phone
+with the same account. An Expo account is free and unrelated to EAS billing.
+
+Log in *before* starting the dev server. The manifest Expo Go reads is built at
+startup, so logging in afterwards means restarting it anyway.
 
 Scan the QR code with Expo Go (Camera app on iOS, the Expo Go app on Android).
 Phone and laptop must be on the same Wi-Fi.
@@ -139,7 +148,11 @@ From the mobile taster lesson, in order:
 2. Allow **Node.js** through the Windows Defender firewall (both private and
    public).
 3. Fall back to tunnel mode: `npx expo start --tunnel`.
-4. Check the SDK. If Expo Go refuses to open the project, it has probably
+4. Check you are signed in — `npx expo whoami` on the laptop, and the same
+   account in the Expo Go app. Note that `eas whoami` can report an account
+   while `expo whoami` says "Not logged in"; they are separate sessions and
+   Expo Go needs the latter.
+5. Check the SDK. If Expo Go refuses to open the project, it has probably
    updated past the project's SDK — Expo Go only supports the newest one. Run
    `npx expo install expo@latest && npx expo install --fix`, then
    `npx expo-doctor`. That is a real upgrade, not a workaround.
