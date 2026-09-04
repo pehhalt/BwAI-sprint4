@@ -323,21 +323,34 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
       a sync that refused is exactly that. It would also be dishonest evidence —
       a design system populated by an agent bypassing the tool is not the round
       trip this exercise is testing.
-- [ ] Write the round trip up in the README: what survived the handoff intact,
+- [x] Write the round trip up in the README: what survived the handoff intact,
       what the agent still got wrong, whether the second sync changed anything.
+      All three answered in [`README.md`](./README.md), with both screenshots
+      and a section on where this fell short — Phase 4, and the missing usage
+      baseline. The risk table from the start of the part is kept and scored.
 
 ### Task 1 success checklist (from the course text)
 
-- [ ] Design system created in Claude Design from actual codebase components
-- [ ] Rendered screen matches app typography, colour and spacing tokens
-- [ ] Three layout variations evaluated, selection rationale logged
+- [-] Design system created in Claude Design from actual codebase components —
+      **not met, and not achievable here.** The converter refuses a React Native
+      repo. A design system exists, but its tokens are a preset's; the app's real
+      tokens live in an uploaded style guide beside it.
+- [x] Rendered screen matches app typography, colour and spacing tokens — every
+      colour, size, gap and radius exact against `theme.ts`, measured off the
+      exported markup rather than eyeballed.
+- [x] Three layout variations evaluated, selection rationale logged — in the
+      canvas notes and in [`docs/design-log.md`](./docs/design-log.md), including
+      the argument that later failed on hardware.
 - [-] Canvas annotations specify visual and state behaviours — **not met.** No
       annotations were added to the canvas. The state behaviours were specified
       in `docs/prompts.md` and implemented, but not by this mechanism and not in
       the bundle. See Phase 4.
-- [ ] Claude Code built the feature from the exported handoff bundle
-- [ ] Feature verified on a branch and merged
-- [ ] `/design-sync` re-run post-merge
+- [x] Claude Code built the feature from the exported handoff bundle
+- [x] Feature verified on a branch and merged — `feat/settings-screen`,
+      reviewed with `/code-review` (five findings, four fixed, one rejected with
+      reasons), checked on the phone, merged `--no-ff`, pushed.
+- [x] `/design-sync` re-run post-merge — refused again, recorded. The loop does
+      not close on this repo by either route.
 
 ---
 
