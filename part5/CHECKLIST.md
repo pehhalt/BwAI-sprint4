@@ -25,8 +25,9 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
       the before/after this part planned cannot be made honestly. Marked rather
       than back-filled with an estimate. Phase F's closing-figures box goes with
       it.
-- [ ] Confirm the OpenRouter key from Part 4 is still valid and the spending cap
-      is still in place.
+- [x] Confirm the OpenRouter key from Part 4 is still valid and the spending cap
+      is still in place. *Both confirmed in Task 2: the key authenticated on the
+      first request, and the user confirmed the cap before anything billable ran.*
 - [-] Locate the OpenAI API key (Task 3 only). **Not needed.** The course text
       permits authenticating against a ChatGPT subscription, and the user has
       Plus, so `codex login` was used instead of a key. Cheaper too: the plan is
@@ -222,7 +223,7 @@ means the specification has to be written somewhere else or not at all.
 - [x] Share → Claude Code, target **Local agent**. Web session was rejected on
       purpose: it runs against the GitHub remote and cannot drive Expo or reach
       the phone, and device verification is the point of Phase 5.
-  - [~] **With custom instructions** — the field works and was used, just not for
+  - [x] **With custom instructions** — the field works and was used, just not for
         the constraints. `Implement: Use layout 2a.` in the generated prompt *is*
         the custom instruction, typed and carried across intact. The longer
         constraints — reuse existing components, do not touch Wisdom or History,
@@ -303,7 +304,12 @@ means the specification has to be written somewhere else or not at all.
         deleted as a side effect. `index.tsx:223` and `settings.tsx:249` now
         agree at `0.85`. Convergence by luck, not by structure — a third copy
         would diverge exactly the same way.
-  - [ ] **`<Disclosure />` extraction is now unclaimed rather than deferred.**
+  - [-] **`<Disclosure />` extraction is now unclaimed rather than deferred.**
+        *Left undone on purpose, and it now has two independent arguments behind
+        it — the duplication found by `/design-sync`, and the open-weight
+        reviewer noting the disclosure is tied to `AsyncStorage` state rather
+        than to the screen. Out of scope for Part 5; it touches the line
+        `CLAUDE.md` treats as safety-critical and deserves its own change.*
         It was held back to avoid widening the Settings task; Settings has
         merged, so that reason has expired. Still defined twice, and still with
         different alignment — `index.tsx:157` centres it (`:247`),
@@ -605,9 +611,24 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 
 ## Phase F — Finish
 
-- [ ] README updated with what actually happened, including what failed.
-- [ ] Every box above either ticked or marked `[-]` with a reason.
-- [ ] Screenshots in `docs/screenshots/`, referenced from the README.
-- [ ] Closing usage figures recorded against the Phase 0 baseline.
-- [ ] Sprint-level `../README.md` given its Part 5 section.
-- [ ] Final commit.
+- [x] README updated with what actually happened, including what failed. Tasks 2
+      and 3 written up with results, the three-reviewer comparison and its
+      caveat, a *What we got wrong* section listing five claims this folder
+      asserted and later had to withdraw, and a *Using the Codex CLI in later
+      parts* section so the setup is reusable rather than a one-off.
+- [x] Every box above either ticked or marked `[-]` or `[!]` with a reason.
+- [x] Screenshots in `docs/screenshots/`, referenced from the README —
+      `settings-three-variations.png` and `settings-built.png`, side by side at
+      the top of Task 1 so the design and the built screen can be compared
+      directly.
+- [-] Closing usage figures recorded against the Phase 0 baseline. **Cannot be
+      done honestly — the baseline was never taken.** A closing number with
+      nothing to compare it against would look like measurement and be
+      arithmetic. The two figures that *are* real are recorded instead: about
+      six cents of OpenRouter spend, and nothing at all on OpenAI, since Codex
+      authenticated against the ChatGPT subscription.
+- [x] Sprint-level `../README.md` given its Part 5 section, plus the Part 4
+      section it was also missing. Corrected while there: it said the sprint had
+      three parts, and repeated part3's claim that SDK 54 is what Expo Go
+      requires — no longer true, and the thing that forced part4's upgrade.
+- [x] Final commit.

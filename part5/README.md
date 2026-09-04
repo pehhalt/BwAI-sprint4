@@ -397,31 +397,168 @@ written, which is what a history is for.
 
 ---
 
-# Task 2 — An independent verifier on an open-weight model
+# Task 2 — An independent verifier on an open-weight model ✅
 
-**Not started.** Not blocked either.
-
-Configure the **standalone Codex CLI** to run an open-weight model through
-OpenRouter, then use it to adversarially review code Claude Code wrote.
+**Done.** The standalone Codex CLI running `z-ai/glm-5.2` through OpenRouter,
+reviewing code Claude Code wrote. Findings and triage in
+[`docs/verifier-findings.md`](./docs/verifier-findings.md); the working config
+in [`docs/codex-config.toml`](./docs/codex-config.toml).
 
 The reasoning is single-point-of-failure: if your builder and your reviewer are
-the same model family from the same vendor, they share blind spots, and an access
-change at that vendor takes out both at once. Claude Code builds, an open-weight
-model on OpenRouter checks — different family, different provider, weights that
-stay downloadable regardless.
+the same model family from the same vendor, they share blind spots, and an
+access change at that vendor takes out both at once.
 
-Task 1 has left it a good target: the Settings branch is merged, and the five
-findings `/code-review` produced are a benchmark. A second reviewer that finds
-none of them tells you something; one that finds a sixth tells you more.
+**It found five things and overlapped with Claude's five on nothing.** Two were
+real and fixed — a missing unmount guard, and a failed clear that gave the user
+no feedback behind a confirmation promising the action could not be undone. One
+was a hardcoded hex that had been sitting in the repo since Part 4, outside the
+diff Claude reviewed. Two were not acted on: a dead field whose failure scenario
+cannot occur, and a compliant-but-fragile disclosure that now stands as a second
+argument for extracting `<Disclosure />`.
 
-# Task 3 — The `codex-plugin-cc` plugin
+**The result worth keeping:** two of its five findings were about code *Claude's
+review caused*. The second reviewer's value was not catching what the first
+missed in the original code — it was catching what the first reviewer's fix
+introduced and left behind.
 
-**Not started.** Optional, and being done because the key already exists.
+## What the setup actually cost
 
-OpenAI's plugin exposes `/codex:*` slash commands inside Claude Code — notably
-`/codex:adversarial-review`. Not the same thing as Task 2: the plugin runs
-OpenAI's models from inside Claude Code, Task 2 runs an open-weight model from a
-separate terminal. Doing both gives three independent reviewers on the same diff.
+Four of the five setup risks logged at the start of this part were wrong, and
+one was not on the list at all.
+
+| Expected | Actual |
+| --- | --- |
+| `z-ai/glm-5.2` may not exist | It does. So does `:free` — which 429s past usefulness, so the paid slug was used |
+| `wire_api = "responses"` is probably wrong for OpenRouter | **It works.** The course text is right; `"chat"` was never needed |
+| `[profiles.<name>]` block in `config.toml` | Gone in `0.153.2`. It is now a separate `$CODEX_HOME/<name>.config.toml`, layered with `-p` |
+| — | **Codex's Windows sandbox rejects every `CreateProcess`** in both `read-only` and `workspace-write`, including `cmd.exe /c dir` |
+
+The sandbox one is the trap, and it is not in the course text at all. Only
+`--sandbox danger-full-access` permits the agent to run anything on Windows,
+which means reviewing a repository there costs you the read-only guarantee.
+Isolated by re-running with our own harness sandbox disabled — still blocked, so
+it is Codex's layer. Mitigated with a clean, pushed working tree, so anything
+the agent touched was recoverable.
+
+Total spend: about six cents.
+
+# Task 3 — The `codex-plugin-cc` plugin ✅
+
+**Done, and the answer about the plugin is negative.** OpenAI's plugin exposes
+`/codex:*` commands inside Claude Code. Not the same thing as Task 2: the
+plugin runs OpenAI's models from inside Claude Code, Task 2 runs an open-weight
+model from a separate terminal.
+
+**Authentication was the easy part.** `codex login` took the ChatGPT OAuth flow
+— `authMethod: chatgpt`, no API key anywhere — and the plugin picked that up
+with nothing further to configure, because it shells out to the same binary and
+reads the same `~/.codex/auth.json`. Cheaper than a key, too: the subscription
+is already paid for, against roughly ten to forty cents per review on the API.
+
+**The plugin cannot review a repository on Windows, and fails as a pass.**
+`/codex:adversarial-review` returned `verdict: approve` while stating that
+inspection had been blocked by the execution policy. An approval from a reviewer
+that opened no files, with the disclaimer sitting *below* the verdict — read the
+summary line alone and you would conclude a third model signed the code off.
+
+It cannot be configured around. Every sandbox value in the plugin is a hardcoded
+literal — `read-only` at the adversarial-review call site, `workspace-write` at
+most — which are exactly the two modes Codex's Windows sandbox rejects.
+`danger-full-access` appears nowhere in the plugin, and there is no flag, config
+key or environment override.
+
+**Re-run through the CLI at a sandbox that works**, the same model found the
+only data-loss bug any of the three reviewers produced: `addEntry` is
+read-modify-write, `clearHistory` is a delete, and nothing serialised them, so a
+confirmed clear could be silently undone by an in-flight request. Fixed with a
+mutation queue. It also found storage collapsing "empty" and "broken" into one
+answer — which had disabled the Clear button exactly when corrupt storage made
+it the only thing worth pressing. Also fixed.
+
+# All three reviewers, on the same code
+
+| | Framing | Findings | Real |
+| --- | --- | --- | --- |
+| Claude `/code-review` | defects in the diff | 5 | 4 |
+| `glm-5.2` open weight | defects in whole files | 5 | 2 fixed, 3 recorded |
+| `gpt-5.6` ChatGPT plan | approach and design | 5 | 2 fixed, 3 recorded |
+
+**Fifteen findings, none on more than one list.** The course asks whether any two
+agreed on something all three should have caught — there are no instances, which
+is the answer.
+
+The caveat belongs next to the number rather than beneath it: **three different
+framings were used**, so some of the disjointness is by construction. Ask three
+reviewers three different questions and disjoint answers are not a surprise.
+
+What survives the caveat:
+
+- **The only data-loss bug came from the reviewer asked the least specific
+  question.** It is invisible in any single file and only appears when two
+  operations interleave, so neither defect hunt could see it.
+- **The most confident output came from the reviewer that had read nothing** — a
+  bare `approve`. The failure mode that would actually have shipped bad code was
+  not a wrong finding. It was a confident empty one.
+
+# Using the Codex CLI in later parts
+
+It is installed and configured now, so later parts can use it without repeating
+any of the above. Everything below is already working on this machine.
+
+## The two reviewers, one flag apart
+
+    codex exec "..."                 # gpt-5.6 on the ChatGPT plan, free at the margin
+    codex -p openrouter exec "..."   # z-ai/glm-5.2 on OpenRouter, ~4 cents a run
+
+The provider is *defined* in `~/.codex/config.toml` and only *selected* in
+`~/.codex/openrouter.config.toml`, so adding a third model means one more small
+file, not editing the base config.
+
+## The flags that matter
+
+| Flag | Why |
+| --- | --- |
+| `--sandbox danger-full-access` | **Required on Windows.** Without it the agent cannot run a single command, and will tell you it found nothing rather than that it could not look |
+| `--skip-git-repo-check` | For scratch directories that are not repositories |
+| `-` as the prompt, with the prompt piped in | Avoids PowerShell mangling apostrophes and quotes — an inline prompt containing `Grandma's` fails with `unexpected argument` |
+
+So the shape that works, every time:
+
+    Get-Content prompt.txt -Raw | codex exec --sandbox danger-full-access -
+
+## Getting a useful review out of it
+
+Three things made the difference between noise and findings:
+
+1. **Say what kind of review you want.** "Find defects" and "challenge the
+   approach" produced almost completely different output from the same model on
+   the same code. Neither is better; they answer different questions.
+2. **Demand a failure scenario per finding.** Asking for file, line, and *what
+   input causes what wrong behaviour* is what separates a real bug from a style
+   opinion, and it makes triage possible.
+3. **Forbid praise and summary explicitly.** Without it, half the output
+   describes what the code does, which you already know.
+
+## Two things to watch
+
+- **Always check it could actually read the code.** The worst output of this
+  whole part was a confident `approve` from a reviewer that had opened nothing.
+  If a review comes back clean, confirm it looked before believing it.
+- **Triage every finding.** Roughly half of what the second and third reviewers
+  produced was not worth acting on — one argued from a scenario the code makes
+  impossible. A cross-model reviewer earns its place by being wrong in
+  *different* ways, which means the triage is the work, not an afterthought.
+
+## Cost
+
+The ChatGPT plan covers `codex exec` at no marginal cost, so prefer it. Reach
+for `-p openrouter` when you want a genuinely independent family — different
+vendor, downloadable weights — and accept a few cents per run. Free OpenRouter
+slugs exist but rate-limit past usefulness.
+
+---
+
+# The part as a whole
 
 ## Skipped on purpose
 
@@ -444,14 +581,23 @@ scoreboard is more useful than the predictions were.
 | `part4` is mid-upgrade, SDK 54 → 57 | **Avoided.** Nothing touched `part4` until the upgrade landed and ran on the phone. |
 | Claude Design is beta and needs Pro/Max | **Not the real gate.** It was available; the gate was `/design-login`, without which not even listing projects works. |
 | Usage burn | **Not measured.** The baseline was never recorded, so this one cannot be answered either way. |
-| Model slug `z-ai/glm-5.2` may not exist | Untested — Task 2 has not started. |
-| `wire_api = "responses"` | Untested — Task 2 has not started. |
-| Windows | Untested for Task 2. Irrelevant to Task 1. |
+| Model slug `z-ai/glm-5.2` may not exist | **Wrong.** It exists, and so does a `:free` variant — which 429s past usefulness, so the paid slug was used. |
+| `wire_api = "responses"` | **Wrong.** It works against OpenRouter. The course text was right and this risk was not. |
+| Windows | **Right, but not where expected.** Not the install — `npm install -g` took eleven seconds. The Windows problem was Codex's own sandbox rejecting every command in both modes the plugin can reach. |
 
-## Cost
+Four of the seven predictions were wrong, and the one thing that cost the most
+time — the sandbox — was on nobody's list. Predicting failure points is worth
+doing and is not the same as knowing them.
 
-| Thing | Who bills |
-| --- | --- |
-| Claude Design + Claude Code | Existing Claude plan allowance — shared, so design work eats coding budget |
-| Open-weight model via OpenRouter (Task 2) | OpenRouter, existing key, spending cap already set |
-| `codex-plugin-cc` (Task 3) | OpenAI, separately, on the existing key |
+## What this part cost
+
+| Thing | Who bills | Actual |
+| --- | --- | --- |
+| Claude Design + Claude Code | Existing Claude plan allowance — shared, so design work eats coding budget | Not measured; see below |
+| Open-weight model via OpenRouter (Task 2) | OpenRouter, existing key, cap confirmed before the first paid request | **~6 cents** |
+| `codex-plugin-cc` (Task 3) | Planned as OpenAI API billing | **Nothing.** It authenticated against the ChatGPT subscription instead, so no key was needed and no separate billing started |
+
+**The Claude-side figure cannot be given honestly.** The Phase 0 baseline was
+never recorded, so there is no before to compare an after against. Marked as
+missing rather than estimated — an invented number would be worse than no
+number.
