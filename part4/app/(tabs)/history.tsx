@@ -83,10 +83,9 @@ export default function HistoryScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
+  // Holds the title and its padding. It stopped being a two-child row when
+  // Clear moved to Settings, so the row layout came out with it.
   header: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
   },

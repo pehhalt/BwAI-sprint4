@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -26,13 +26,19 @@ export default function WisdomScreen() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Once, on mount, not on focus. This is the tone the screen *starts* on --
-  // re-reading every time the tab regains focus would silently undo a pick the
-  // user just made here.
+  // Once, on mount, not on focus. This is the tone the screen *starts* on:
+  // Settings decides what is checked when the app opens, and the picker here
+  // decides what this request asks for. Re-reading on focus would collapse that
+  // split by undoing a pick made on this screen.
+  const pickedHere = useRef(false);
+
   useEffect(() => {
     let active = true;
     readDefaultTone().then((stored) => {
-      if (active) setTone(stored);
+      // The read is async, so a tap can land first. When it has, it wins --
+      // otherwise the stored default arrives late and silently overwrites it,
+      // which is the failure this effect exists to avoid.
+      if (active && !pickedHere.current) setTone(stored);
     });
     return () => {
       active = false;
@@ -93,7 +99,10 @@ export default function WisdomScreen() {
           return (
             <Pressable
               key={value}
-              onPress={() => setTone(value)}
+              onPress={() => {
+                pickedHere.current = true;
+                setTone(value);
+              }}
               disabled={loading}
               accessibilityRole="radio"
               accessibilityState={{ selected, disabled: loading }}

@@ -61,7 +61,11 @@ export default function SettingsScreen() {
 
   async function doClear() {
     await clearHistory();
-    setSaved(0);
+    // Not setSaved(0): clearHistory swallows its own storage failure and
+    // resolves either way, so assuming success would grey this row out while
+    // the History tab still lists every entry. Re-read and show what is
+    // actually there.
+    setSaved((await readHistory()).length);
   }
 
   function confirmClear() {
@@ -101,7 +105,9 @@ export default function SettingsScreen() {
               key={value}
               onPress={() => pickTone(value)}
               accessibilityRole="radio"
-              accessibilityState={{ selected }}
+              // A radio's checked state comes from `checked`; with only
+              // `selected` set the row is never announced as checkable.
+              accessibilityState={{ checked: selected, selected }}
               accessibilityLabel={`${label}. ${hint}`}
               style={({ pressed }) => [
                 styles.radioRow,
@@ -129,7 +135,6 @@ export default function SettingsScreen() {
         accessibilityHint={nothingSaved ? undefined : 'Asks you to confirm before deleting'}
         style={({ pressed }) => [
           styles.clearRow,
-          nothingSaved && styles.clearRowDisabled,
           pressed && !nothingSaved && styles.pressed,
         ]}>
         <Text style={[styles.clearLabel, nothingSaved && styles.clearLabelDisabled]}>
@@ -226,8 +231,11 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.surface,
   },
   // Disabled reads as disabled rather than as broken: the row keeps its surface
-  // and border, and only the destructive label gives up its colour.
-  clearRowDisabled: { opacity: 0.6 },
+  // and border at full strength, and only the destructive label gives up its
+  // colour. Deliberately not an opacity fade on top of that -- the two stack,
+  // and fading Palette.textMuted to 60% takes "Nothing saved yet" from 6.35:1
+  // on surface to roughly 3:1. That line is the only thing explaining why the
+  // row is inert, so it is the last thing that should get hard to read.
   clearLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.danger },
   clearLabelDisabled: { color: Palette.textMuted },
   clearCount: { fontSize: Type.caption, color: Palette.textMuted },
