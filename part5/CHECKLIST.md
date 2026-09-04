@@ -281,11 +281,48 @@ means the specification has to be written somewhere else or not at all.
     accident*, and three new entries — the twice-defined disclosure line with
     its alignment mismatch, corner radius having no token (14 / 16 / 8 as
     literals), and letter spacing having none either.
-- [ ] Re-upload the regenerated guide to the design system at `claude.ai/design`
-      (user — browser). The agent can generate it but cannot upload it, the same
-      split as Phase 2.
-- [ ] Confirm in Claude Design that anything new — a new component, a new token —
-      actually arrived.
+- [!] Re-upload the regenerated guide to the design system at `claude.ai/design`
+      (user — browser). **The upload succeeded and updated nothing.** There is no
+      "upload into this project" path: uploading brand material creates a *new*
+      project every time. The guide landed in a third project,
+      `Mobile app design scope` (`c1a9feed`), holding an `uploads/` folder and
+      nothing else — no `_ds/`, no design-system files. It is a plain
+      `PROJECT_TYPE_PROJECT`, which is why `list_projects` does not list it.
+- [x] Confirm in Claude Design that anything new — a new component, a new token —
+      actually arrived. **Verified by `get_file`: the content arrived complete and
+      correct.** Section label with its `0.84px` tracking, the destructive row in
+      both states, all three new contrast rows, and the re-triaged inconsistencies
+      table — nothing lost or mangled in transit. `settings.PNG` came across too.
+      **And none of it reached the design system.**
+
+**So Phase 6 closes on a harder answer than expected: the loop cannot be closed
+on this repo by either route, and trying fragments the design system.**
+
+| Route | Outcome |
+| --- | --- |
+| `/design-sync` → the `Organic` design system | Refuses. Not a browser-renderable component library. Confirmed twice. |
+| Browser upload of brand material | Succeeds, but creates a new plain project each time. Not an update mechanism. |
+
+Three projects now exist where one was intended, and **the design system is the
+only one of the three that has never held this app's tokens**:
+
+| Project | Type | Holds |
+| --- | --- | --- |
+| `Organic` (`5e1ee6eb`) | design system | the preset's terracotta tokens, untouched since creation |
+| `Grandma's Wisdom mobile app` (`5b8ef819`) | project | the canvas, `Organic` attached and ignored, the **Phase 2** style guide |
+| `Mobile app design scope` (`c1a9feed`) | project | the **current** style guide and all three screenshots |
+
+The newest upload is the only place with the shipped tokens, and it is the one
+place nothing is attached to. That is not a workflow, it is an accumulation.
+
+- [-] Write the guide into `Organic` directly through the `DesignSync` tool —
+      **available and deliberately not done.** `Organic` is writable, so
+      `finalize_plan` + `write_files` would work. Phase 2 recorded the skill's own
+      instruction that its workflow is reserved for explicit user invocation and
+      must not be reproduced by other means; hand-rolling a sync to route around
+      a sync that refused is exactly that. It would also be dishonest evidence —
+      a design system populated by an agent bypassing the tool is not the round
+      trip this exercise is testing.
 - [ ] Write the round trip up in the README: what survived the handoff intact,
       what the agent still got wrong, whether the second sync changed anything.
 
