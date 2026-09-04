@@ -78,6 +78,28 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
       is the wrong trade for this project.
 - [-] Option C (codebase converter) — **not available for this repo.** Reason
       documented rather than skipped silently.
+- [x] **Tested after the fact: `Connect GitHub` — a third route neither the course
+      text nor this checklist knew about, and the one we should have used.** It
+      sits in the same project-creation menu as *Attach file*, under *Code*:
+      *"connect a codebase for Claude to design within."* Distinct from the CLI
+      converter, and it is not blocked by React Native.
+
+      Pointed at this repo and asked to report the tokens **and cite the file for
+      each**, it read `part4/constants/theme.ts` directly — every colour, the type
+      scale, the spacing scale, correct and sourced from the real code rather than
+      from the style guide sitting in `part5`. It found the hardcoded `#F5E7E2`,
+      the untokenised radii, and **the `Platform.select` font conditionality**,
+      which is the one thing predicted to defeat it. It also found three things
+      the hand-written guide missed: untokenised font weights, body text setting
+      no family at all, and the safe-area insets making vertical padding a runtime
+      value.
+
+      What it did **not** do is audit. It repeated every contrast ratio that
+      appears in a code comment and computed none that do not, so the three
+      failing pairs went unmentioned. It reads what the code *says*, comments
+      included — which is also why it did so well: the comments carry the
+      reasoning. **The right answer was both routes**, the repo for the values and
+      the guide for the judgement about them.
 - [x] Fall back to **Option B** (*Create here*, upload existing brand material):
       a style guide generated from `constants/theme.ts` plus the two existing
       app screenshots. Tokens still come from the real codebase, carried by hand

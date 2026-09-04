@@ -67,6 +67,57 @@ Worth knowing before the next project. The theme you are forced to choose is a
 formality when you are bringing your own tokens, and the design system it creates
 is then overridden by the thing you upload next to it.
 
+### The route we should have used was in the menu the whole time
+
+**Connect GitHub.** Not the CLI converter — a separate option in the project
+creation menu, under *Code*, described as *"connect a codebase for Claude to
+design within."* We used *Attach file* and uploaded a hand-written style guide
+instead. Tested afterwards, out of curiosity, and it should have been the
+inbound route from the start.
+
+Pointed at this repo and asked to report the design tokens **and name the file
+each value came from**, it went straight to `part4/constants/theme.ts` and read
+it correctly. Every colour, the full type scale, the spacing scale — right,
+cited, and derived from the React Native source rather than from the notes
+sitting one folder away in `part5`.
+
+It also caught, unprompted:
+
+- the hardcoded `#F5E7E2` in `history.tsx`, and that it violates the project's
+  own no-hex-in-screens rule
+- that radii are not tokenised — 14, 16, 8, 13/7 as literals
+- **that the fonts are conditional.** `Platform.select` gives `ui-serif` on iOS
+  and the Georgia stack on web, so the serif depends on the target. This is the
+  one thing I had predicted it would miss, and the specific trap the hand-written
+  guide existed to cover.
+- things the guide did *not* have: font weights are literal `'600'` rather than
+  tokenised, body text sets no family at all and falls through to the platform
+  font, and the vertical padding is a runtime value from the device's safe-area
+  insets rather than a fixed number.
+
+**Why it did so well is worth understanding.** It was not inferring from the
+code alone — it was reading the *comments*. It quoted `theme.ts` on why
+`textMuted` was raised from a failing 3.78:1, and `settings.tsx` on why the
+disabled row swaps colour instead of fading. Well-commented code turns out to be
+machine-readable design documentation, which is a better argument for writing
+comments than any I had before.
+
+**What the hand-written guide still added.** It reports contrast the code does
+not document. The model repeated every ratio that appears in a comment and
+computed none that do not — so `accentText` on `accent` at 3.77:1 and the two
+tone pills at 3.26:1 and 4.13:1 went unmentioned, along with the instruction not
+to propagate them. It reads what the code *says*, including its comments. It
+does not audit what the code does.
+
+So the right answer was **both**: connect the repo for the values, supply the
+guide for the judgement about them. Not one instead of the other.
+
+**The mistake underneath this one is the generalisable part.** Asked whether a
+GitHub link would have worked, I said no — reasoning from how `/design-sync`
+behaves to how a differently-purposed feature would behave, without checking
+that the second feature existed. It was in the menu. The lesson is narrow and
+sharp: *a tool refusing one route is not evidence about its other routes.*
+
 ### The bundle carried structure and tokens, and nothing else
 
 This is the part that justifies the whole exercise, and the part that
@@ -209,6 +260,11 @@ above the fold is an argument that moves with the phone.**
   and becomes a specification.
 - **The usage baseline was never recorded**, so the before/after comparison this
   folder planned cannot be made honestly. Marked as such rather than estimated.
+- **We used the wrong inbound route, and only found out afterwards.** *Connect
+  GitHub* was offered in the same menu we used to attach a file. Nobody looked
+  at the other entries. The result was still accurate, so nothing downstream is
+  wrong — but the hand-transcription step was avoidable work, and finding that
+  out required a test run after the deliverable was already closed.
 
 ---
 
