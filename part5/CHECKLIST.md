@@ -19,12 +19,16 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
 - [x] `claude --version` — `/design-sync` needs a current CLI. Update with
       `npm update -g @anthropic-ai/claude-code` if the command is unrecognised.
       *2.1.259, current enough.*
-- [ ] Record starting usage: `/usage` in Claude Code and Settings → Usage on the
+- [-] Record starting usage: `/usage` in Claude Code and Settings → Usage on the
       web. Design work shares the coding allowance, so we want a before/after.
+      **Missed, and no longer recoverable** — the baseline moment has passed, so
+      the before/after this part planned cannot be made honestly. Marked rather
+      than back-filled with an estimate. Phase F's closing-figures box goes with
+      it.
 - [ ] Confirm the OpenRouter key from Part 4 is still valid and the spending cap
       is still in place.
 - [ ] Locate the OpenAI API key (Task 3 only).
-- [ ] Commit: the README and this checklist.
+- [x] Commit: the README and this checklist.
 
 ---
 
@@ -116,7 +120,7 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
 - [x] Screenshot it. Covered by the token table in `docs/design-log.md`, which is
       measured off the markup rather than off pixels — stronger evidence than a
       screenshot for this particular claim.
-- [ ] Commit: sync findings, style guide, screenshots.
+- [x] Commit: sync findings, style guide, screenshots.
 
 ### Phase 3 — Three variations
 
@@ -138,7 +142,7 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
       [`docs/design-system/exports/Grandmas Wisdom App.html`](./docs/design-system/exports/).
       A self-unpacking bundle; the artboard markup carries literal token values,
       which is what makes Phase 5 a build rather than a guess.
-- [ ] Commit: variation screenshots and rationale.
+- [x] Commit: variation screenshots and rationale.
 
 ### Phase 4 — Refine it, using all four mechanisms
 
@@ -222,10 +226,21 @@ means the specification has to be written somewhere else or not at all.
       below the fold" was one of the four arguments for picking 2a. Rationale
       corrected rather than quietly left standing.
 - [x] `npx expo lint` clean — exit 0, no findings. `npx tsc --noEmit` also clean.
-- [ ] Review before merge (`/code-review`, plus the Task 2 verifier if it is ready
-      by then — that is the natural pairing).
-- [ ] Merge to `main`.
-- [ ] Commit / PR per the usual rule.
+- [x] Review before merge (`/code-review`, plus the Task 2 verifier if it is ready
+      by then — that is the natural pairing). `/code-review` ran on the branch and
+      returned **five findings: four real, one rejected.** The real ones were an
+      async race that the comment above it claimed to prevent, a clear that
+      assumed it had succeeded, a disabled row whose comment asserted the
+      opposite of what its code did, and radios never announced as checkable.
+      The rejected one read the cold-start-only default tone as a defect; it is
+      the specified behaviour. *The Task 2 verifier was not ready, so the pairing
+      did not happen — one reviewer, not two.*
+- [x] Merge to `main` — `--no-ff`, so the branch stays legible as a unit
+      (12 files, +566/−72). Branch deleted with `-d` after the merge.
+- [x] Commit / PR per the usual rule. No PR: this is a solo coursework repo with
+      no reviewers to request, so the branch-review-merge shape was kept and the
+      PR step would have been ceremony. Pushed to `origin/main`, secret-scanned
+      first.
 
 ### Phase 6 — Close the loop
 
@@ -372,8 +387,11 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 - [ ] Set `OPENROUTER_API_KEY` as a **user environment variable** on Windows, not
       a shell export — an export dies with the terminal.
 - [ ] Open a fresh terminal and confirm the variable is visible there.
-- [ ] Confirm the key is nowhere in this repo: a search for `sk-or-` returns
-      nothing. The key lives in the environment only.
+- [x] Confirm the key is nowhere in this repo: a search for `sk-or-` returns
+      nothing. The key lives in the environment only. *Done early, before the
+      first push: scanned every outgoing commit for `sk-or-`, `sk-` and
+      `api_key` patterns — clean, and the only tracked env file is
+      `part4/.env.example` with an empty value.*
 - [ ] Confirm the OpenRouter spending cap is still set before spending anything.
 
 ### Phase 3 — Configure the provider and profile
