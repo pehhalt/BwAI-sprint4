@@ -153,9 +153,20 @@ insets are taken, and `Type.label` at 17 plus `Type.caption` at 14 need more
 room than the mock allowed.
 
 This is the direct cause of divergence 1 — two extra text lines is roughly the
-About block's worth of vertical space. Worth knowing for the next screen: a
-design frame is a guess at a device, and text that fits on one line in the mock
-is the first thing to check on hardware.
+About block's worth of vertical space.
+
+**Almost certainly a device-width difference, not a design error.** The frame
+was 402pt wide, which is a current-generation iPhone; the phone this was tested
+on is an older and narrower one. On a 402pt device the hints may well sit on one
+line exactly as drawn, and the About block may well fit. Left alone on that
+basis — the screen scrolls, and narrowing the design to the smallest phone in
+circulation would be optimising for the test device rather than for the app.
+
+The lesson survives the explanation, just in a smaller form: **a design frame is
+a guess at one device, and the first thing to check on hardware is whether text
+that fits on one line in the mock still does.** It is also a reason to be careful
+with any argument that rests on what sits above the fold — as the 2a-over-2b
+rationale did — since the fold moves with the phone.
 
 ## 3. The tab bar icons are filled in the app and outlined in the design
 

@@ -105,7 +105,9 @@ export default function WisdomScreen() {
               }}
               disabled={loading}
               accessibilityRole="radio"
-              accessibilityState={{ selected, disabled: loading }}
+              // A radio's checked state comes from `checked`; with only
+              // `selected` set the row is never announced as checkable.
+              accessibilityState={{ checked: selected, selected, disabled: loading }}
               accessibilityLabel={`${label}. ${hint}`}
               style={({ pressed }) => [
                 styles.radioRow,
