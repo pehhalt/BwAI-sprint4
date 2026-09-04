@@ -87,9 +87,14 @@ silently resolving in either direction.
   compatible with the SDK.
 - Colours, spacing, and type sizes come from `constants/theme.ts` — no hardcoded hex
   values in screens.
-- The AI-disclosure line (`Wisdom is AI-generated.`) must appear on **every**
-  screen that renders AI output, and must sit **above** that output rather than
-  below it. A label placed after its content can be scrolled past unseen; on the
+- The AI-disclosure line lives in one place: `<Disclosure>` in
+  `components/disclosure.tsx`. **Wrap the AI output in it. Never re-type the
+  line.** It takes children precisely so that "above its content" is structural
+  rather than something each screen has to remember — there is no way to put
+  content above the label without moving that content outside the component. Its
+  `style` prop shapes the wrapper's layout and cannot restyle the line.
+- The disclosure must appear on **every** screen that renders AI output, and must
+  sit **above** that output rather than below it. A label placed after its content can be scrolled past unseen; on the
   History screen it once was a list footer, after up to 100 entries, which an
   audit flagged as a failure. Never a `ListFooterComponent`, a modal, a settings
   page, or a dismissable banner. A new screen showing AI output needs its own
@@ -97,6 +102,10 @@ silently resolving in either direction.
   exists and renders no AI output, so it carries no disclosure line of its own;
   that is why "never a settings page" above is a live rule rather than a
   hypothetical one.
+- **Do not make the disclosure conditional on data.** The History screen once
+  hid it when the list was empty, which tied the guarantee to storage state and
+  made the label come and go. On a screen whose purpose is AI output, render it
+  unconditionally.
 - That line is intended to address the EU AI Act Article 50 transparency duty.
   Describe it that way rather than asserting compliance as settled fact; the
   classification depends on deployment context, not on the code alone.

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Disclosure } from '@/components/disclosure';
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
 import { apiUrl } from '@/lib/api';
 import { addEntry, type Tone } from '@/lib/history';
@@ -149,21 +150,20 @@ export default function WisdomScreen() {
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       {/*
-        Above the card, not below it: a label that follows the content it
-        labels can be scrolled past unseen. EU AI Act Article 50 asks for
-        disclosure at or before the interaction, so it reads first.
+        The wrapper puts the label above the card structurally, rather than by
+        this screen remembering to. EU AI Act Article 50 asks for disclosure at
+        or before the interaction, so it renders before anything is generated
+        too, not only once there is wisdom to label.
       */}
-      <Text style={styles.disclosure} accessibilityRole="text">
-        Wisdom is AI-generated.
-      </Text>
-
-      {wisdom ? (
-        <View style={styles.card}>
-          <Text style={styles.wisdom}>{wisdom}</Text>
-        </View>
-      ) : (
-        !error && <Text style={styles.empty}>Pick a mood and ask. She always has something.</Text>
-      )}
+      <Disclosure>
+        {wisdom ? (
+          <View style={styles.card}>
+            <Text style={styles.wisdom}>{wisdom}</Text>
+          </View>
+        ) : (
+          !error && <Text style={styles.empty}>Pick a mood and ask. She always has something.</Text>
+        )}
+      </Disclosure>
     </ScrollView>
   );
 }
@@ -241,9 +241,4 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
   },
   error: { fontSize: Type.body, color: Palette.danger, textAlign: 'center' },
-  disclosure: {
-    fontSize: Type.caption,
-    color: Palette.disclosure,
-    textAlign: 'center',
-  },
 });

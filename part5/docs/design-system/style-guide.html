@@ -232,7 +232,14 @@
 
 <h3>Disclosure line</h3>
 <p class="disclosure-text" style="margin-top:var(--space-sm)">Wisdom is AI-generated.</p>
-<p>14px in the dedicated <code>disclosure</code> colour. <strong>Mandatory on every screen that renders AI output, positioned above that output.</strong> Never a list footer, a modal, a settings page, or a dismissable banner — a label placed after its content can be scrolled past unseen, which a previous audit flagged as a failure. It addresses the EU AI Act Article 50 transparency duty; describe that as the intent, not as settled compliance.</p>
+<p>14px centred in the dedicated <code>disclosure</code> colour. <strong>Mandatory on every screen that renders AI output, positioned above that output.</strong> Never a list footer, a modal, a settings page, or a dismissable banner — a label placed after its content can be scrolled past unseen, which a previous audit flagged as a failure. It addresses the EU AI Act Article 50 transparency duty; describe that as the intent, not as settled compliance.</p>
+<div class="note">
+  <strong>It is a wrapper, not a label.</strong> In code this is <code>&lt;Disclosure&gt;</code>, and the AI
+  output goes inside it as children. That is what makes "above its content" structural instead of a
+  convention each screen repeats: there is no way to place content above the line without moving it
+  out of the component. Render it unconditionally on a screen whose purpose is AI output — tying it
+  to whether data exists makes the label come and go.
+</div>
 
 <h3>Empty state</h3>
 <div class="demo" style="text-align:center;color:var(--text-muted);font-size:var(--type-body)">Nothing here yet.</div>
@@ -265,7 +272,7 @@ Always behind a confirmation.</p>
 <table>
   <tr><th>Issue</th><th>Where</th><th>Should be</th></tr>
   <tr><td><s>Pressed opacity differs between screens</s> <strong>closed</strong></td><td>Both survivors now <code>0.85</code> (<code>index.tsx:223</code>, <code>settings.tsx:249</code>)</td><td>Closed by accident, not by fix — the <code>0.6</code> copy was on History's Clear button, which Settings took over. Still no token, so a third copy would diverge again.</td></tr>
-  <tr><td>The disclosure line is defined twice, with different alignment</td><td><code>index.tsx:157</code> centres it; <code>history.tsx:50</code> pads it left</td><td>One <code>&lt;Disclosure /&gt;</code> that always renders above its content — a structural guarantee rather than a convention each screen repeats</td></tr>
+  <tr><td><s>The disclosure line is defined twice, with different alignment</s> <strong>closed</strong></td><td>Now one <code>&lt;Disclosure&gt;</code> wrapper in <code>components/disclosure.tsx</code>; the string appears exactly once in the codebase</td><td>Closed properly, not by accident: the component takes children, so the label cannot end up below its content. History's copy was left-aligned and is now centred to match — the drift resolved in favour of this guide's value.</td></tr>
   <tr><td>Corner radius has no token</td><td><code>14</code> for rows and buttons, <code>16</code> for cards, <code>8</code> for pills — all literals</td><td>A <code>Radius</code> scale beside <code>Spacing</code>, since these are already a de facto scale</td></tr>
   <tr><td>Letter spacing has no token</td><td><code>0.84px</code>, computed inline in <code>settings.tsx</code></td><td>Fine as one use; a second use is the moment to promote it</td></tr>
   <tr><td>Hardcoded hex in a screen</td><td><code>#F5E7E2</code> in <code>history.tsx</code> <code>toneFunny</code></td><td>A <code>dangerSoft</code> token — the project rule forbids hex in screens</td></tr>

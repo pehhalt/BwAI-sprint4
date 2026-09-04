@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Disclosure } from '@/components/disclosure';
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
 import { readHistory, type WisdomEntry } from '@/lib/history';
 
@@ -44,39 +45,41 @@ export default function HistoryScreen() {
         Fixed above the list, never a ListFooterComponent. A footer renders
         after the last row, so a reader could scroll dozens of AI-generated
         entries and never reach the label -- which defeats the point of it.
-      */}
-      {entries.length > 0 && (
-        <Text style={styles.disclosure} accessibilityRole="text">
-          Wisdom is AI-generated.
-        </Text>
-      )}
+        Wrapping the list is what makes that structural instead of a habit.
 
-      <FlatList
-        data={entries}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.list,
-          { paddingBottom: insets.bottom + Spacing.xl },
-          entries.length === 0 && styles.listEmpty,
-        ]}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No wisdom yet. Go ask Grandma.</Text>
-        }
-        renderItem={({ item }) => (
-          <View
-            style={styles.card}
-            accessible
-            accessibilityLabel={`AI-generated ${item.tone} wisdom: ${item.text}`}>
-            <Text style={styles.wisdom}>{item.text}</Text>
-            <View style={styles.meta}>
-              <Text style={[styles.tone, item.tone === 'funny' && styles.toneFunny]}>
-                {item.tone === 'funny' ? 'Funny' : 'Wise'}
-              </Text>
-              <Text style={styles.when}>{formatWhen(item.createdAt)}</Text>
+        It no longer hides when the list is empty. That condition tied the
+        guarantee to storage state, so the label appeared and disappeared as
+        entries came and went; an unconditional label on the screen whose whole
+        purpose is AI output is the more robust reading.
+      */}
+      <Disclosure style={styles.body}>
+        <FlatList
+          data={entries}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={[
+            styles.list,
+            { paddingBottom: insets.bottom + Spacing.xl },
+            entries.length === 0 && styles.listEmpty,
+          ]}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No wisdom yet. Go ask Grandma.</Text>
+          }
+          renderItem={({ item }) => (
+            <View
+              style={styles.card}
+              accessible
+              accessibilityLabel={`AI-generated ${item.tone} wisdom: ${item.text}`}>
+              <Text style={styles.wisdom}>{item.text}</Text>
+              <View style={styles.meta}>
+                <Text style={[styles.tone, item.tone === 'funny' && styles.toneFunny]}>
+                  {item.tone === 'funny' ? 'Funny' : 'Wise'}
+                </Text>
+                <Text style={styles.when}>{formatWhen(item.createdAt)}</Text>
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      </Disclosure>
     </View>
   );
 }
@@ -90,7 +93,10 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
   },
   title: { fontSize: Type.title, fontFamily: Fonts.serif, color: Palette.text },
-  list: { paddingHorizontal: Spacing.lg, gap: Spacing.md },
+  // The horizontal gutter lives on the wrapper now, so the label and the rows
+  // cannot drift apart.
+  body: { flex: 1, paddingHorizontal: Spacing.lg },
+  list: { gap: Spacing.md },
   listEmpty: { flexGrow: 1, justifyContent: 'center' },
   empty: {
     fontSize: Type.body,
@@ -124,10 +130,4 @@ const styles = StyleSheet.create({
   },
   toneFunny: { color: Palette.danger, backgroundColor: Palette.dangerSoft },
   when: { fontSize: Type.caption, color: Palette.textMuted },
-  disclosure: {
-    fontSize: Type.caption,
-    color: Palette.disclosure,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
 });
