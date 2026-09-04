@@ -55,6 +55,30 @@ actually renders. The design system would be subtly wrong in exactly the way
 that is hardest to notice. We took Option B (upload existing brand material)
 instead, and recorded the refusal rather than skipping it silently.
 
+**But React Native is the smaller half of the reason, and framing it that way
+undersells the finding.** The requirement that actually generalises is the
+component library. `/design-sync` publishes a design system you *already have*,
+expressed in code as a catalogue of reusable parts. It does not create one.
+
+Nothing in this sprint could feed it:
+
+| Part | What it is | Readable by `/design-sync`? |
+| --- | --- | --- |
+| 1 | PDFs, diagrams, a deck | No — not code |
+| 2 | Markdown findings | No — not code |
+| 3 | An Expo app, SDK 54, **no `components/` directory at all** | No |
+| 4 | This Expo app | No |
+| 5 | Documentation | No |
+
+No `.storybook` and no `*.stories.*` anywhere in the repository. Part 3 is the
+instructive one: set React Native aside entirely and it still fails, on the
+catalogue requirement alone.
+
+So the circularity is the real finding. **The prescribed first step requires the
+thing the exercise exists to teach you to produce.** A Python project fails it.
+A hand-written HTML site fails it. Any project without a mature front-end fails
+it — which is nearly every coursework project, and a good share of real ones.
+
 ### Uploaded brand material beats an attached design system
 
 The create flow forces you to pick a preset theme before it accepts anything,
@@ -112,6 +136,15 @@ does not audit what the code does.
 So the right answer was **both**: connect the repo for the values, supply the
 guide for the judgement about them. Not one instead of the other.
 
+**It is not in the assignment.** The full course text was given to the session
+that wrote this README and the checklist, and the route inventory they were built
+from names only `/design-sync`, the codebase converter, and *Create here / upload
+existing brand material*. Connect GitHub appears in none of them. Worth stating
+plainly as a gap in the material: **the course prescribes a workflow that cannot
+run on this project, and the route that does work sits unmentioned in the same
+menu.** For a part whose subject is designing against a real codebase, that is
+the omission that cost the most time here.
+
 **The mistake underneath this one is the generalisable part.** Asked whether a
 GitHub link would have worked, I said no — reasoning from how `/design-sync`
 behaves to how a differently-purposed feature would behave, without checking
@@ -130,6 +163,16 @@ type — exact. 10 / 16 / 24 / 36px spacing — exact. Radius 14 and the 26 / 13
 radio geometry — lifted from `index.tsx` and returned unchanged. The copy came
 back word for word, including the strings we asked it not to reword. A screenshot
 handoff would have made the agent guess at every one of those.
+
+**But what the bundle is *worth* depends on what you are building, and the course
+text does not say so.** The export is web code — HTML with inline styles, plus a
+device frame and a runtime. For a web project that is nearly usable output: same
+technology as the app, adapt rather than re-derive. For us it was a
+**specification**. Every value transferred exactly and every line still had to be
+rewritten in React Native's vocabulary — `View` for `div`, `StyleSheet.create`
+for CSS. "The bundle beats a screenshot" is true here, by a narrower margin than
+the intended audience gets: we received a precise spec, a web team receives a
+running head start.
 
 **What did not travel.** The custom instructions were not in the generated
 prompt. Reuse the existing components, do not touch Wisdom or History, keep the
