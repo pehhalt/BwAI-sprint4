@@ -265,11 +265,25 @@ means the specification has to be written somewhere else or not at all.
         review: it touches the line `CLAUDE.md` treats as safety-critical, so
         "always above its content" has to become a structural guarantee rather
         than a convention each future agent remembers.
-- [ ] Close the loop the way that *is* available: regenerate
-      `docs/design-system/style-guide.html` from the shipped code and re-upload
-      it, so the design system carries the two things the Settings screen added
-      — the small-caps section label and the disabled destructive row. A manual
-      version of the same loop, and worth saying out loud that it is manual.
+- [x] Close the loop the way that *is* available: regenerate
+      `docs/design-system/style-guide.html` from the shipped code, so the design
+      system carries the two things the Settings screen added — the small-caps
+      section label and the disabled destructive row. A manual version of the
+      same loop, and worth saying out loud that it is manual. Regenerated from
+      `theme.ts` plus all three screen stylesheets:
+  - Both new components documented with their real values, including why the
+    disabled row swaps colour instead of fading, and why the letter spacing is
+    `0.84px` rather than `.06em`.
+  - Three new colour pairs measured — `danger` on surface 4.90:1, `text` on
+    `accentSoft` 11.08:1, `textMuted` on `accentSoft` 5.57:1. **All three pass**,
+    so the Settings screen added no new contrast debt.
+  - Known inconsistencies re-triaged: pressed-opacity struck as closed *by
+    accident*, and three new entries — the twice-defined disclosure line with
+    its alignment mismatch, corner radius having no token (14 / 16 / 8 as
+    literals), and letter spacing having none either.
+- [ ] Re-upload the regenerated guide to the design system at `claude.ai/design`
+      (user — browser). The agent can generate it but cannot upload it, the same
+      split as Phase 2.
 - [ ] Confirm in Claude Design that anything new — a new component, a new token —
       actually arrived.
 - [ ] Write the round trip up in the README: what survived the handoff intact,

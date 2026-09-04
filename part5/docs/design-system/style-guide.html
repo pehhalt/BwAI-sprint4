@@ -89,12 +89,25 @@
   .pill.funny { color: var(--danger); background: #F5E7E2; }
   .wisdom-text { font-family: var(--serif); font-size: var(--type-wisdom); line-height: 1.45; }
   .disclosure-text { font-size: var(--type-caption); color: var(--disclosure); text-align: center; }
+  .section-label { font-size: var(--type-caption); font-weight: 600; letter-spacing: 0.84px; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-sm); }
+  .destructive-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding: var(--space-md); border-radius: 14px; border: 1px solid var(--border); background: var(--surface); margin-bottom: var(--space-sm); }
+  .destructive-label { font-size: var(--type-label); font-weight: 600; color: var(--danger); }
+  .destructive-row.disabled .destructive-label { color: var(--text-muted); }
+  .destructive-count { font-size: var(--type-caption); color: var(--text-muted); }
 
   @media print { body { padding: 0; max-width: none; } h2 { break-after: avoid; } .demo, table { break-inside: avoid; } }
 </style>
 
 <h1>Grandma's Wisdom of the Day</h1>
-<p class="lede">Design system, extracted by hand from <code>constants/theme.ts</code> and the two screen stylesheets. Source of truth is the code, not this document.</p>
+<p class="lede">Design system, extracted by hand from <code>constants/theme.ts</code> and the three screen stylesheets. Source of truth is the code, not this document.</p>
+
+<div class="note">
+  <strong>Regenerated 2026-09-04</strong>, from the shipped code after the Settings screen
+  merged. The first version was written from the two screens that existed before it. What
+  changed: two new components (the small-caps <em>section label</em> and the <em>destructive
+  row</em>), three new measured colour pairs, and one known inconsistency closed. Read the
+  <em>Known inconsistencies</em> table at the end before copying anything.
+</div>
 
 <div class="note">
   <strong>Why this exists.</strong> <code>/design-sync</code> cannot read this repo — it is a
@@ -147,6 +160,9 @@
   <tr><td>disclosure on background</td><td>6.50:1</td><td>14px</td><td class="pass">pass</td></tr>
   <tr><td>disclosure on surface</td><td>7.00:1</td><td>14px</td><td class="pass">pass</td></tr>
   <tr><td>danger on background</td><td>4.55:1</td><td>18px</td><td class="pass">pass, barely</td></tr>
+  <tr><td>danger on surface</td><td>4.90:1</td><td>17px / 600 destructive row</td><td class="pass">pass</td></tr>
+  <tr><td>text on accentSoft</td><td>11.08:1</td><td>17px / 600 selected radio label</td><td class="pass">pass</td></tr>
+  <tr><td>textMuted on accentSoft</td><td>5.57:1</td><td>14px selected radio hint</td><td class="pass">pass</td></tr>
   <tr><td>accentText on accent</td><td>3.77:1</td><td>20px / 600 button</td><td class="fail">borderline — passes only if 20px&nbsp;600 counts as large text</td></tr>
   <tr><td>accent on accentSoft</td><td>3.26:1</td><td>14px / 600 pill</td><td class="fail">fails AA</td></tr>
   <tr><td>danger on #F5E7E2</td><td>4.13:1</td><td>14px / 600 pill</td><td class="fail">fails AA</td></tr>
@@ -163,7 +179,7 @@
 <table>
   <tr><th>Token</th><th>Size</th><th>Family</th><th>Used for</th></tr>
   <tr><td><code>caption</code></td><td>14px</td><td>sans</td><td>Hints, timestamps, tone pills, the disclosure line</td></tr>
-  <tr><td><code>label</code></td><td>17px</td><td>sans, 600</td><td>Row labels, the Clear action</td></tr>
+  <tr><td><code>label</code></td><td>17px</td><td>sans, 600</td><td>Row labels, the destructive Clear&nbsp;history action</td></tr>
   <tr><td><code>body</code></td><td>18px</td><td>sans / serif</td><td>Subtitles, empty states, errors; history entries in serif at 1.5 line height</td></tr>
   <tr><td><code>button</code></td><td>20px</td><td>sans, 600</td><td>Primary button text</td></tr>
   <tr><td><code>wisdom</code></td><td>25px</td><td>serif</td><td>The wisdom itself, 1.45 line height</td></tr>
@@ -222,11 +238,36 @@
 <div class="demo" style="text-align:center;color:var(--text-muted);font-size:var(--type-body)">Nothing here yet.</div>
 <p>18px muted, centred, vertically centred in the available space.</p>
 
+<h3>Section label</h3>
+<div class="section-label">Wisdom</div>
+<div class="radio-row selected" style="margin-bottom:0">
+  <div class="radio-outer"><div class="radio-inner"></div></div>
+  <div><div class="radio-label">Wise</div><div class="radio-hint">Something calm and genuinely useful</div></div>
+</div>
+<p>14px/600, uppercase, <code>textMuted</code>, <code>sm</code> below. Letter spacing is
+<strong>0.84px</strong> — the design's <code>.06em</code> resolved against the caption size,
+because React&nbsp;Native takes letter spacing in points and cannot track the font size itself.
+Sits directly on the ground, never on a surface: only interactive rows get a surface.
+<code>xl</code> above each label except the first.</p>
+
+<h3>Destructive row</h3>
+<div class="destructive-row"><span class="destructive-label">Clear history</span><span class="destructive-count">24 saved</span></div>
+<div class="destructive-row disabled"><span class="destructive-label">Clear history</span><span class="destructive-count">Nothing saved yet</span></div>
+<p>Same surface, border and radius&nbsp;14 as the radio row, so destructive does not mean
+differently shaped. Label 17/600 in <code>danger</code>; the count 14px <code>textMuted</code>,
+right-aligned. <strong>Disabled swaps the label to <code>textMuted</code> and changes nothing
+else</strong> — deliberately no opacity fade on top, because the two stack and take the count
+from 6.35:1 to roughly 3:1, and that line is the only thing explaining why the row is inert.
+Always behind a confirmation.</p>
+
 <h2>Known inconsistencies</h2>
 <p>Recorded so a design system does not enshrine them.</p>
 <table>
   <tr><th>Issue</th><th>Where</th><th>Should be</th></tr>
-  <tr><td>Pressed opacity differs between screens</td><td><code>0.85</code> in <code>index.tsx</code>, <code>0.6</code> in <code>history.tsx</code></td><td>One value, in the token module</td></tr>
+  <tr><td><s>Pressed opacity differs between screens</s> <strong>closed</strong></td><td>Both survivors now <code>0.85</code> (<code>index.tsx:223</code>, <code>settings.tsx:249</code>)</td><td>Closed by accident, not by fix — the <code>0.6</code> copy was on History's Clear button, which Settings took over. Still no token, so a third copy would diverge again.</td></tr>
+  <tr><td>The disclosure line is defined twice, with different alignment</td><td><code>index.tsx:157</code> centres it; <code>history.tsx:50</code> pads it left</td><td>One <code>&lt;Disclosure /&gt;</code> that always renders above its content — a structural guarantee rather than a convention each screen repeats</td></tr>
+  <tr><td>Corner radius has no token</td><td><code>14</code> for rows and buttons, <code>16</code> for cards, <code>8</code> for pills — all literals</td><td>A <code>Radius</code> scale beside <code>Spacing</code>, since these are already a de facto scale</td></tr>
+  <tr><td>Letter spacing has no token</td><td><code>0.84px</code>, computed inline in <code>settings.tsx</code></td><td>Fine as one use; a second use is the moment to promote it</td></tr>
   <tr><td>Hardcoded hex in a screen</td><td><code>#F5E7E2</code> in <code>history.tsx</code> <code>toneFunny</code></td><td>A <code>dangerSoft</code> token — the project rule forbids hex in screens</td></tr>
   <tr><td>Tone pills below AA</td><td>3.26:1 and 4.13:1</td><td>Darker foregrounds at 4.5:1 or better</td></tr>
 </table>
