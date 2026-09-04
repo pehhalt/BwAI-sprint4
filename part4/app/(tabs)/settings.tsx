@@ -184,7 +184,11 @@ ${message}`);
           Clear history
         </Text>
         <Text style={styles.clearCount}>
-          {unreadable ? 'Cannot be read' : nothingToClear ? 'Nothing saved' : `${saved} saved`}
+          {unreadable
+            ? 'Saved wisdom cannot be read'
+            : nothingToClear
+              ? 'Nothing saved yet'
+              : `${saved} saved`}
         </Text>
       </Pressable>
 
@@ -262,11 +266,11 @@ const styles = StyleSheet.create({
   radioLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.text },
   radioHint: { fontSize: Type.caption, color: Palette.textMuted, marginTop: 2 },
 
+  // Stacked, not a two-column row. Side by side, the status text competed with
+  // the action for one line and ran out of the card on a narrower phone. This is
+  // the radio rows' own shape -- bold label, quieter line under it -- minus the
+  // circle, so the screen gains no new idea to accommodate a fix.
   clearRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.md,
     padding: Spacing.md,
     borderRadius: 14,
     borderWidth: 1,
@@ -279,18 +283,10 @@ const styles = StyleSheet.create({
   // and fading Palette.textMuted to 60% takes "Nothing saved yet" from 6.35:1
   // on surface to roughly 3:1. That line is the only thing explaining why the
   // row is inert, so it is the last thing that should get hard to read.
-  // The action keeps its width; the status text gives way. React Native does
-  // not shrink a Text inside a row on its own, so without these the longest
-  // status ran outside the card rather than wrapping inside it -- and it gets
-  // longer again at larger system font sizes.
-  clearLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.danger, flexShrink: 0 },
+  clearLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.danger },
   clearLabelDisabled: { color: Palette.textMuted },
-  clearCount: {
-    fontSize: Type.caption,
-    color: Palette.textMuted,
-    flexShrink: 1,
-    textAlign: 'right',
-  },
+  // Same 2px as radioHint, so the two stacked rows on this screen line up.
+  clearCount: { fontSize: Type.caption, color: Palette.textMuted, marginTop: 2 },
 
   about: {
     fontSize: Type.body,
