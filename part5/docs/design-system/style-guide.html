@@ -1,0 +1,232 @@
+<title>Grandma's Wisdom — Design System</title>
+<style>
+  :root {
+    --background: #FAF4E8;
+    --surface: #FFFDF8;
+    --border: #E7DCC6;
+    --text: #3E2F23;
+    --text-muted: #6E5B49;
+    --disclosure: #665545;
+    --accent: #6E8B6A;
+    --accent-text: #FFFFFF;
+    --accent-soft: #EAF0E8;
+    --danger: #A85A46;
+
+    --space-xs: 6px;
+    --space-sm: 10px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 36px;
+
+    --type-caption: 14px;
+    --type-label: 17px;
+    --type-body: 18px;
+    --type-button: 20px;
+    --type-wisdom: 25px;
+    --type-title: 34px;
+
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+    padding: var(--space-xl) var(--space-lg) 64px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  h1 { font-family: var(--serif); font-size: var(--type-title); margin: 0 0 4px; }
+  .lede { color: var(--text-muted); margin: 0 0 var(--space-xl); font-size: var(--type-body); }
+  h2 {
+    font-family: var(--serif);
+    font-size: 26px;
+    margin: var(--space-xl) 0 var(--space-sm);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: var(--type-label); margin: var(--space-lg) 0 var(--space-sm); }
+  p { margin: 0 0 var(--space-sm); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+
+  table { border-collapse: collapse; width: 100%; margin: var(--space-sm) 0 var(--space-md); font-size: 14px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-weight: 600; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+  td code { background: var(--surface); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-sm); margin: var(--space-md) 0; }
+  .swatch { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .chip { height: 58px; }
+  .swatch dl { margin: 0; padding: 8px 10px; }
+  .swatch dt { font-weight: 600; font-size: 13px; }
+  .swatch dd { margin: 0; font-size: 12px; color: var(--text-muted); font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+  .spacing-row { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: 6px; font-size: 13px; }
+  .spacing-bar { background: var(--accent); height: 14px; border-radius: 3px; }
+  .spacing-name { width: 96px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+  .fail { color: var(--danger); font-weight: 600; }
+  .pass { color: var(--accent); font-weight: 600; }
+
+  .demo { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-lg); margin: var(--space-sm) 0 var(--space-md); }
+  .note { border-left: 3px solid var(--accent); padding: 2px 0 2px var(--space-md); margin: var(--space-md) 0; color: var(--text-muted); }
+  .note strong { color: var(--text); }
+
+  /* Component demonstrations, in web approximations of the native styles. */
+  .radio-row { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); border-radius: 14px; border: 1px solid var(--border); background: var(--surface); margin-bottom: var(--space-sm); }
+  .radio-row.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .radio-outer { width: 26px; height: 26px; border-radius: 13px; border: 2px solid var(--text-muted); display: grid; place-items: center; flex: none; }
+  .radio-row.selected .radio-outer { border-color: var(--accent); }
+  .radio-inner { width: 13px; height: 13px; border-radius: 7px; background: var(--accent); }
+  .radio-label { font-size: var(--type-label); font-weight: 600; }
+  .radio-hint { font-size: var(--type-caption); color: var(--text-muted); margin-top: 2px; }
+  .btn { background: var(--accent); color: var(--accent-text); border-radius: 14px; padding: 18px; text-align: center; font-size: var(--type-button); font-weight: 600; }
+  .pill { display: inline-block; font-size: var(--type-caption); font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 2px var(--space-sm); border-radius: 8px; }
+  .pill.funny { color: var(--danger); background: #F5E7E2; }
+  .wisdom-text { font-family: var(--serif); font-size: var(--type-wisdom); line-height: 1.45; }
+  .disclosure-text { font-size: var(--type-caption); color: var(--disclosure); text-align: center; }
+
+  @media print { body { padding: 0; max-width: none; } h2 { break-after: avoid; } .demo, table { break-inside: avoid; } }
+</style>
+
+<h1>Grandma's Wisdom of the Day</h1>
+<p class="lede">Design system, extracted by hand from <code>constants/theme.ts</code> and the two screen stylesheets. Source of truth is the code, not this document.</p>
+
+<div class="note">
+  <strong>Why this exists.</strong> <code>/design-sync</code> cannot read this repo — it is a
+  React&nbsp;→&nbsp;browser converter expecting a component library, and this is a React&nbsp;Native
+  app with its UI written inline. This document carries the same information across by hand.
+  Every value below is copied from the code, not designed here.
+</div>
+
+<h2>Principles</h2>
+<p><strong>One warm light palette, on purpose.</strong> The app does not follow the system colour scheme. The screen is essentially a single quote on paper, and a dark variant of that reads as a different app rather than the same one at night. Do not propose a dark mode.</p>
+<p><strong>Larger type than a typical app, on purpose.</strong> It is meant to be read at arm's length.</p>
+<p><strong>Serif for content, sans for interface.</strong> Titles and the wisdom itself are serif; labels, buttons and metadata are the system sans.</p>
+<p><strong>No hardcoded values in screens.</strong> Every colour, size and gap comes from the token module.</p>
+
+<h2>Colour</h2>
+<div class="swatches">
+  <div class="swatch"><div class="chip" style="background:#FAF4E8"></div><dl><dt>background</dt><dd>#FAF4E8</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#FFFDF8"></div><dl><dt>surface</dt><dd>#FFFDF8</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#E7DCC6"></div><dl><dt>border</dt><dd>#E7DCC6</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#3E2F23"></div><dl><dt>text</dt><dd>#3E2F23</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#6E5B49"></div><dl><dt>textMuted</dt><dd>#6E5B49</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#665545"></div><dl><dt>disclosure</dt><dd>#665545</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#6E8B6A"></div><dl><dt>accent</dt><dd>#6E8B6A</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#EAF0E8"></div><dl><dt>accentSoft</dt><dd>#EAF0E8</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#A85A46"></div><dl><dt>danger</dt><dd>#A85A46</dd></dl></div>
+  <div class="swatch"><div class="chip" style="background:#FFFFFF"></div><dl><dt>accentText</dt><dd>#FFFFFF</dd></dl></div>
+</div>
+
+<table>
+  <tr><th>Token</th><th>Hex</th><th>Role</th></tr>
+  <tr><td><code>background</code></td><td><code>#FAF4E8</code></td><td>Screen ground. Warm cream, like old paper.</td></tr>
+  <tr><td><code>surface</code></td><td><code>#FFFDF8</code></td><td>Cards, rows, the tab bar.</td></tr>
+  <tr><td><code>border</code></td><td><code>#E7DCC6</code></td><td>Hairlines. 1px, never heavier.</td></tr>
+  <tr><td><code>text</code></td><td><code>#3E2F23</code></td><td>Primary text. Deep warm brown, never pure black.</td></tr>
+  <tr><td><code>textMuted</code></td><td><code>#6E5B49</code></td><td>Secondary text, hints, timestamps.</td></tr>
+  <tr><td><code>disclosure</code></td><td><code>#665545</code></td><td>The AI-disclosure line only. A shade darker than muted, deliberately.</td></tr>
+  <tr><td><code>accent</code></td><td><code>#6E8B6A</code></td><td>Sage. Primary action, selection, the "wise" tone.</td></tr>
+  <tr><td><code>accentSoft</code></td><td><code>#EAF0E8</code></td><td>Selected row background, pill background.</td></tr>
+  <tr><td><code>danger</code></td><td><code>#A85A46</code></td><td>Destructive actions, errors, the "funny" tone.</td></tr>
+</table>
+
+<h3>Measured contrast</h3>
+<p>Computed, not estimated. AA needs 4.5:1 for normal text and 3:1 for large text (24px, or 18.66px bold).</p>
+<table>
+  <tr><th>Pair</th><th>Ratio</th><th>Used at</th><th>Verdict</th></tr>
+  <tr><td>text on background</td><td>11.72:1</td><td>all sizes</td><td class="pass">pass</td></tr>
+  <tr><td>text on surface</td><td>12.63:1</td><td>all sizes</td><td class="pass">pass</td></tr>
+  <tr><td>textMuted on background</td><td>5.89:1</td><td>14–18px</td><td class="pass">pass</td></tr>
+  <tr><td>textMuted on surface</td><td>6.35:1</td><td>14–18px</td><td class="pass">pass</td></tr>
+  <tr><td>disclosure on background</td><td>6.50:1</td><td>14px</td><td class="pass">pass</td></tr>
+  <tr><td>disclosure on surface</td><td>7.00:1</td><td>14px</td><td class="pass">pass</td></tr>
+  <tr><td>danger on background</td><td>4.55:1</td><td>18px</td><td class="pass">pass, barely</td></tr>
+  <tr><td>accentText on accent</td><td>3.77:1</td><td>20px / 600 button</td><td class="fail">borderline — passes only if 20px&nbsp;600 counts as large text</td></tr>
+  <tr><td>accent on accentSoft</td><td>3.26:1</td><td>14px / 600 pill</td><td class="fail">fails AA</td></tr>
+  <tr><td>danger on #F5E7E2</td><td>4.13:1</td><td>14px / 600 pill</td><td class="fail">fails AA</td></tr>
+</table>
+
+<div class="note">
+  <strong>Do not propagate the failing pairs.</strong> The tone pills are 14px semibold and fall
+  under the 4.5:1 floor. The palette comments in <code>theme.ts</code> record a previous fix that
+  raised <code>textMuted</code> from 3.78:1 — the pills were missed by that pass. New designs
+  should darken the pill foreground rather than copy these values.
+</div>
+
+<h2>Typography</h2>
+<table>
+  <tr><th>Token</th><th>Size</th><th>Family</th><th>Used for</th></tr>
+  <tr><td><code>caption</code></td><td>14px</td><td>sans</td><td>Hints, timestamps, tone pills, the disclosure line</td></tr>
+  <tr><td><code>label</code></td><td>17px</td><td>sans, 600</td><td>Row labels, the Clear action</td></tr>
+  <tr><td><code>body</code></td><td>18px</td><td>sans / serif</td><td>Subtitles, empty states, errors; history entries in serif at 1.5 line height</td></tr>
+  <tr><td><code>button</code></td><td>20px</td><td>sans, 600</td><td>Primary button text</td></tr>
+  <tr><td><code>wisdom</code></td><td>25px</td><td>serif</td><td>The wisdom itself, 1.45 line height</td></tr>
+  <tr><td><code>title</code></td><td>34px</td><td>serif</td><td>Screen titles</td></tr>
+</table>
+<p style="font-family:var(--serif);font-size:34px;margin:var(--space-md) 0 0">Grandma's Wisdom</p>
+<p class="wisdom-text" style="margin:0 0 var(--space-md)">Measure twice, cut once, and never trust a recipe without butter.</p>
+
+<div class="note">
+  <strong>Fonts are platform-resolved.</strong> <code>Fonts</code> uses <code>Platform.select</code>,
+  so the app renders iOS <code>ui-serif</code> and <code>system-ui</code> on device, and the Georgia
+  stack only on web. This document shows the web branch. Design against the shapes, not the exact faces.
+</div>
+
+<h2>Spacing</h2>
+<div class="spacing-row"><span class="spacing-name">xs — 6px</span><span class="spacing-bar" style="width:6px"></span></div>
+<div class="spacing-row"><span class="spacing-name">sm — 10px</span><span class="spacing-bar" style="width:10px"></span></div>
+<div class="spacing-row"><span class="spacing-name">md — 16px</span><span class="spacing-bar" style="width:16px"></span></div>
+<div class="spacing-row"><span class="spacing-name">lg — 24px</span><span class="spacing-bar" style="width:24px"></span></div>
+<div class="spacing-row"><span class="spacing-name">xl — 36px</span><span class="spacing-bar" style="width:36px"></span></div>
+<p>Screen gutters are <code>lg</code>. Gaps between stacked blocks are <code>md</code>. Gaps within a group are <code>sm</code>.</p>
+
+<h2>Components</h2>
+<p>These live inline in the screens rather than in a component module — the reason the converter route was unavailable. Specifications are read off the two stylesheets.</p>
+
+<h3>Card</h3>
+<div class="demo" style="padding:var(--space-lg)">
+  <p class="wisdom-text" style="margin:0">A watched pot never boils, but an unwatched one boils over.</p>
+</div>
+<p><code>surface</code> background, 1px <code>border</code>, radius <strong>16</strong>, padding <code>lg</code>. The History variant adds a <code>sm</code> gap between text and metadata.</p>
+
+<h3>Radio row</h3>
+<div class="radio-row selected">
+  <div class="radio-outer"><div class="radio-inner"></div></div>
+  <div><div class="radio-label">Wise</div><div class="radio-hint">Something calm and genuinely useful</div></div>
+</div>
+<div class="radio-row">
+  <div class="radio-outer"></div>
+  <div><div class="radio-label">Funny</div><div class="radio-hint">Advice, right up until the last word</div></div>
+</div>
+<p>Radius <strong>14</strong>, padding <code>md</code>, gap <code>md</code>. Outer ring 26px with a 2px stroke; inner dot 13px. Selected swaps the border to <code>accent</code> and the fill to <code>accentSoft</code>. Label 17px/600, hint 14px muted, 2px apart.</p>
+
+<h3>Primary button</h3>
+<div class="btn">Ask Grandma</div>
+<p>Radius <strong>14</strong>, vertical padding 18px (<code>md</code>&nbsp;+&nbsp;2), full width. Text <code>accentText</code> at 20px/600. Disabled drops to 0.75 opacity and the label changes rather than only dimming.</p>
+
+<h3>Tone pill</h3>
+<p style="margin-top:var(--space-sm)"><span class="pill">wise</span> &nbsp; <span class="pill funny">funny</span></p>
+<p>14px/600, radius <strong>8</strong>, padding <code>sm</code> horizontal and 2px vertical. <span class="fail">Both variants fail AA — see the contrast table.</span></p>
+
+<h3>Disclosure line</h3>
+<p class="disclosure-text" style="margin-top:var(--space-sm)">Wisdom is AI-generated.</p>
+<p>14px in the dedicated <code>disclosure</code> colour. <strong>Mandatory on every screen that renders AI output, positioned above that output.</strong> Never a list footer, a modal, a settings page, or a dismissable banner — a label placed after its content can be scrolled past unseen, which a previous audit flagged as a failure. It addresses the EU AI Act Article 50 transparency duty; describe that as the intent, not as settled compliance.</p>
+
+<h3>Empty state</h3>
+<div class="demo" style="text-align:center;color:var(--text-muted);font-size:var(--type-body)">Nothing here yet.</div>
+<p>18px muted, centred, vertically centred in the available space.</p>
+
+<h2>Known inconsistencies</h2>
+<p>Recorded so a design system does not enshrine them.</p>
+<table>
+  <tr><th>Issue</th><th>Where</th><th>Should be</th></tr>
+  <tr><td>Pressed opacity differs between screens</td><td><code>0.85</code> in <code>index.tsx</code>, <code>0.6</code> in <code>history.tsx</code></td><td>One value, in the token module</td></tr>
+  <tr><td>Hardcoded hex in a screen</td><td><code>#F5E7E2</code> in <code>history.tsx</code> <code>toneFunny</code></td><td>A <code>dangerSoft</code> token — the project rule forbids hex in screens</td></tr>
+  <tr><td>Tone pills below AA</td><td>3.26:1 and 4.13:1</td><td>Darker foregrounds at 4.5:1 or better</td></tr>
+</table>
