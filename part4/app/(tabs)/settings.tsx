@@ -1,5 +1,5 @@
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Platform,
@@ -27,6 +27,15 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const [tone, setTone] = useState<Tone>('wise');
   const [saved, setSaved] = useState(0);
+
+  // The two effects below guard their own async work with a local flag, but
+  // doClear runs from an Alert callback and has no cleanup to hang one on --
+  // and that is the path most likely to resolve after the user has navigated
+  // away. One ref covers it.
+  const mounted = useRef(true);
+  useEffect(() => () => {
+    mounted.current = false;
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -60,12 +69,31 @@ export default function SettingsScreen() {
   }
 
   async function doClear() {
-    await clearHistory();
-    // Not setSaved(0): clearHistory swallows its own storage failure and
-    // resolves either way, so assuming success would grey this row out while
-    // the History tab still lists every entry. Re-read and show what is
-    // actually there.
-    setSaved((await readHistory()).length);
+    const wrote = await clearHistory();
+    // Not setSaved(0): re-read, so the count reflects storage rather than an
+    // assumption about it.
+    const remaining = (await readHistory()).length;
+    if (!mounted.current) return;
+    setSaved(remaining);
+
+    // A destructive action that promised "it cannot be undone" and then did
+    // nothing must say so. Showing the unchanged count is accurate but silent,
+    // and silence after a confirmed delete reads as success.
+    if (!wrote || remaining > 0) {
+      notify('Could not clear history', 'The saved wisdom is still on this phone.');
+    }
+  }
+
+  // Alert.alert is a no-op on react-native-web, so every dialog in this file
+  // needs the browser path too, not just the confirmation.
+  function notify(title: string, message: string) {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}
+
+${message}`);
+      return;
+    }
+    Alert.alert(title, message);
   }
 
   function confirmClear() {

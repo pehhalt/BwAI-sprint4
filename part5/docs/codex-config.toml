@@ -1,0 +1,35 @@
+# Codex CLI — OpenRouter provider, as described in the Part 5 course text.
+# Provider definitions must live in the user-level config; a project-local
+# config.toml ignores them.
+
+model_provider = "openrouter"
+model = "z-ai/glm-5.2"
+
+[model_providers.openrouter]
+name = "OpenRouter"
+base_url = "https://openrouter.ai/api/v1"
+env_key = "OPENROUTER_API_KEY"
+wire_api = "responses"
+
+[projects.'c:\users\ehhal\appdata\local\temp\claude\c--projects-turingcollege-bwai-sprint4-part5\44adcd53-0f41-47a1-804f-d8b00c8e7474\scratchpad\codex-smoke']
+trust_level = "trusted"
+
+# ---------------------------------------------------------------------------
+# Evidence copy of ~/.codex/config.toml. The key is never in this file, or in
+# any file: env_key names the environment variable, and OPENROUTER_API_KEY is
+# set as a Windows *user* environment variable so it survives closing the
+# terminal. A shell export would not.
+#
+# Verified on 2026-09-04 with codex-cli 0.153.2:
+#
+#   wire_api = "responses"   WORKS against OpenRouter. The course text is
+#                            right and the risk we logged against it was
+#                            wrong. No need for "chat".
+#
+#   model = "z-ai/glm-5.2"   The slug the course names does exist, and so
+#                            does a ":free" variant. The free one is not
+#                            usable: it returned 429 Too Many Requests after
+#                            Codex exhausted its internal retries.
+#
+# Run with:  codex exec --sandbox danger-full-access "<prompt>"
+# See docs/verifier-findings.md for why that sandbox mode, and not a safer one.

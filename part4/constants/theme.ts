@@ -55,6 +55,11 @@ export const Palette = {
   accentText: '#FFFFFF',
   accentSoft: '#EAF0E8',
   danger: '#A85A46',
+  // The "funny" tone's soft background. Lived as a literal in history.tsx
+  // until a cross-model review caught it against the no-hex-in-screens rule.
+  // Its contrast against danger is 4.13:1, which fails AA for 14px text --
+  // tokenising it does not fix that, and the fix is tracked separately.
+  dangerSoft: '#F5E7E2',
 };
 
 export const Spacing = { xs: 6, sm: 10, md: 16, lg: 24, xl: 36 };

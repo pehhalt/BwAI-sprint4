@@ -69,10 +69,18 @@ export async function addEntry(
   return next;
 }
 
-export async function clearHistory(): Promise<void> {
+/**
+ * Erase the saved history. Returns whether the write actually succeeded.
+ *
+ * It used to swallow the failure and resolve `void`, which left callers unable
+ * to tell "cleared" from "silently did nothing" -- a bad property behind a
+ * destructive confirmation that promises the action cannot be undone.
+ */
+export async function clearHistory(): Promise<boolean> {
   try {
     await AsyncStorage.removeItem(STORAGE_KEY);
+    return true;
   } catch {
-    // Nothing useful to do; the next read falls back to an empty list.
+    return false;
   }
 }

@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
-  toneFunny: { color: Palette.danger, backgroundColor: '#F5E7E2' },
+  toneFunny: { color: Palette.danger, backgroundColor: Palette.dangerSoft },
   when: { fontSize: Type.caption, color: Palette.textMuted },
   disclosure: {
     fontSize: Type.caption,

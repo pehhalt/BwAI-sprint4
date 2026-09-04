@@ -403,67 +403,118 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 
 ### Phase 1 — Install the CLI
 
-- [ ] `node --version` — needs 18.18 or higher.
-- [ ] `npm install -g @openai/codex`. **Not** the `curl -fsSL ... | sh` script;
-      that is the macOS/Linux path.
-- [ ] `codex --version` to confirm it is on PATH.
+- [x] `node --version` — needs 18.18 or higher. *v26.3.1.*
+- [x] `npm install -g @openai/codex`. **Not** the `curl -fsSL ... | sh` script;
+      that is the macOS/Linux path. *Installed in 11s.*
+- [x] `codex --version` to confirm it is on PATH. *`codex-cli 0.153.2`.*
+- [x] **`codex doctor` exists and the course text predates it.** Diagnoses
+      install, config, auth and runtime in one command, and it is how the missing
+      key was confirmed. Worth running first, not last.
 - [ ] Note in the README that this is the *standalone CLI*, a different thing from
       the plugin in Task 3. The course text warns about exactly this confusion.
 
 ### Phase 2 — Credentials
 
-- [ ] Set `OPENROUTER_API_KEY` as a **user environment variable** on Windows, not
-      a shell export — an export dies with the terminal.
-- [ ] Open a fresh terminal and confirm the variable is visible there.
+- [x] Set `OPENROUTER_API_KEY` as a **user environment variable** on Windows, not
+      a shell export — an export dies with the terminal. Set via
+      `[Environment]::SetEnvironmentVariable(..., 'User')`, reading the value
+      straight out of `part4/.env` so it never passed through a command line or a
+      transcript.
+- [x] Open a fresh terminal and confirm the variable is visible there. **73 chars,
+      `sk-or-` prefix.** Worth knowing: already-running processes do not see it.
+      `codex doctor` reported the key missing in a shell started beforehand —
+      inherited environment, not a broken variable.
 - [x] Confirm the key is nowhere in this repo: a search for `sk-or-` returns
       nothing. The key lives in the environment only. *Done early, before the
       first push: scanned every outgoing commit for `sk-or-`, `sk-` and
       `api_key` patterns — clean, and the only tracked env file is
       `part4/.env.example` with an empty value.*
-- [ ] Confirm the OpenRouter spending cap is still set before spending anything.
+- [x] Confirm the OpenRouter spending cap is still set before spending anything.
+      *Confirmed by the user before the first paid request.*
 
 ### Phase 3 — Configure the provider and profile
 
-- [ ] Check whether `~/.codex/config.toml` already exists. If it does, back it up
-      and add to it rather than overwriting.
-- [ ] Add the `[model_providers.openrouter]` block. This **must** live in the
+- [x] Check whether `~/.codex/config.toml` already exists. If it does, back it up
+      and add to it rather than overwriting. *No `~/.codex` at all — clean slate.*
+- [x] Add the `[model_providers.openrouter]` block. This **must** live in the
       user-level config; a project-local config ignores provider definitions.
-- [ ] Pick the model slug from the **live OpenRouter model list**, not from the
-      course text. Prefer a free-tier slug for the smoke test, then decide whether
-      to move to a paid one for the real review.
-- [ ] Add the `[profiles.<name>]` block pointing at that slug.
-- [ ] Copy the finished config to `docs/codex-config.toml` as evidence, with the
-      key referenced by environment variable name only.
+      Validated with `codex --strict-config`, which errors on unrecognised fields
+      — a better check than assuming the schema is what the course text says.
+- [x] Pick the model slug from the **live OpenRouter model list**, not from the
+      course text. **427 models fetched, and the risk we logged was wrong:**
+      `z-ai/glm-5.2` exists, and so does `z-ai/glm-5.2:free`. The free one is
+      unusable — 429 Too Many Requests after Codex exhausted its retries — so the
+      real runs used the paid slug at roughly 4 cents each.
+- [!] Add the `[profiles.<name>]` block pointing at that slug. **The mechanism
+      changed and the course text is out of date.** In `0.153.2`, `-p/--profile`
+      takes a `CONFIG_PROFILE_V2` and *"layers `$CODEX_HOME/<name>.config.toml` on
+      top of the base user config"* — a separate file, not a `[profiles.x]` block.
+      With one provider there is nothing to switch between, so the model is set in
+      the base config and no profile was created.
+- [x] Copy the finished config to `docs/codex-config.toml` as evidence, with the
+      key referenced by environment variable name only. →
+      [`docs/codex-config.toml`](./docs/codex-config.toml)
 
 ### Phase 4 — Smoke test
 
-- [ ] In a small test project, run `codex --profile <name>`.
-- [ ] Prompt: "List the primary files in this project." Confirm it answers from
-      the real files rather than inventing them.
-- [ ] If it errors on the API shape, try `wire_api = "chat"` instead of
+- [x] In a small test project, run `codex`. *Three-file throwaway in the
+      scratchpad; `codex exec` rather than the interactive TUI, so output is
+      capturable.*
+- [x] Prompt: "List the primary files in this project." Confirm it answers from
+      the real files rather than inventing them. **Passed** — named all three and
+      described `add(a, b)` from the actual source, not from the filename.
+- [x] If it errors on the API shape, try `wire_api = "chat"` instead of
       `"responses"`. Record which one actually worked — the course text may be
-      wrong here.
-- [ ] Record every failure mode hit and its fix. This is the most useful part of
+      wrong here. **`"responses"` works; the course text is right and our logged
+      risk was wrong**, so `"chat"` was never needed. Recorded precisely because
+      we predicted the opposite: OpenRouter is historically chat-completions
+      shaped, and it now serves `/responses` as well.
+- [x] Record every failure mode hit and its fix. This is the most useful part of
       the write-up.
+
+      | Failure | Cause | Fix |
+      | --- | --- | --- |
+      | `429 Too Many Requests` | the `:free` slug is rate-limited past usefulness | paid slug |
+      | `Model metadata for … not found` | slug unknown to Codex's own table | warning only, works anyway |
+      | agent could not run *any* command | **Codex's Windows sandbox** | `--sandbox danger-full-access` |
+      | `codex doctor`: auth env var missing | shell predated the user env var | new process |
+
+      **The sandbox one is the trap.** `--sandbox read-only` and `workspace-write`
+      both reject every `CreateProcess` on Windows — including `cmd.exe /c dir` —
+      so the agent can reason but cannot look at anything. Isolated by re-running
+      with our own harness sandbox disabled: still blocked, so it is Codex's
+      layer, not ours. Only `danger-full-access` works, which means reviewing a
+      repo on Windows costs you the read-only guarantee. Mitigated here with a
+      clean, pushed working tree, so anything the agent touched was recoverable.
 
 ### Phase 5 — Make it a real verifier
 
-- [ ] Point it at actual Claude Code output — ideally the Task 1 screen — with an
+- [x] Point it at actual Claude Code output — ideally the Task 1 screen — with an
       explicitly adversarial prompt: find what is wrong, unsafe or unfinished, and
-      do not approve it.
-- [ ] Save its findings to `docs/verifier-findings.md`.
-- [ ] Triage each finding: real / not real / misread the codebase. A cross-model
+      do not approve it. *Ran against the merged Settings work.*
+- [x] Save its findings to [`docs/verifier-findings.md`](./docs/verifier-findings.md).
+- [x] Triage each finding: real / not real / misread the codebase. A cross-model
       reviewer earns its place precisely because it is wrong in *different* ways,
-      so report both directions honestly.
-- [ ] Fix the real ones.
+      so report both directions honestly. **Five findings, zero overlap with
+      Claude's five.** Two real and fixed, one real but resting on a scenario the
+      code makes impossible, one not a defect but a good argument, one real and
+      inconsequential. Both directions reported.
+- [x] Fix the real ones. Hardcoded `#F5E7E2` promoted to `Palette.dangerSoft`;
+      `doClear` given the unmount guard the rest of the file already used;
+      `clearHistory` now returns success, so a failed destructive action can say
+      so instead of looking like it worked. `tsc --noEmit` and `expo lint` clean.
 
 ### Task 2 success checklist (from the course text)
 
-- [ ] Standalone Codex CLI installed and authenticated against OpenRouter
-- [ ] User-level provider and profile mapped to an open-weight model
-- [ ] The independent open-weight agent runs and reads a real project
-- [ ] Cross-model verification done: build and adversarial review on different
-      model families
+- [x] Standalone Codex CLI installed and authenticated against OpenRouter
+- [~] User-level provider and profile mapped to an open-weight model — provider
+      yes, profile no. The `[profiles.x]` mechanism the course describes no longer
+      exists in `0.153.2`, and with a single provider there was nothing to switch
+      between.
+- [x] The independent open-weight agent runs and reads a real project
+- [x] Cross-model verification done: build and adversarial review on different
+      model families — Claude built, `z-ai/glm-5.2` reviewed, and the two found
+      disjoint sets of problems.
 
 ---
 
