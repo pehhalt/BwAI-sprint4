@@ -24,10 +24,14 @@ Implement: Use layout 2a.
 
 ## What we asked for on top of it — and where it actually ended up
 
-These constraints were drafted for the Share dialog's custom-instructions box.
-**They are not in the generated prompt above**, so either the box was not used or
-it does not fold its contents into the copied text. They were supplied to the
-agent in the session instead:
+**Corrected.** An earlier version of this note said the custom-instructions box
+did not fold its contents into the copied prompt. It does. The line
+`Implement: Use layout 2a.` above *is* the custom instruction — typed into that
+box and carried across intact.
+
+What follows was drafted for that box and then never entered; a shorter
+instruction was typed instead. So these were supplied to the agent in the session
+rather than travelling with the bundle, and that was our doing:
 
 ```
 Build this into the existing Expo app at part4/, on a new branch.
@@ -45,13 +49,12 @@ other two screens carry, it does not replace it.
 
 ## Notes on the prompt itself
 
-**The constraints did not travel.** That is the sharper version of the finding
-below: the bundle carried structure and tokens faithfully, and carried none of
-the project's rules. Reuse existing components, do not touch Wisdom or History,
-keep the key server-side — every one of those had to be re-stated by hand. A
-handoff bundle is a good answer to *what does it look like* and no answer at all
-to *what is this codebase not allowed to do*. `CLAUDE.md` remains the only thing
-carrying that, which is why it was extended before the build rather than after.
+**A bundle carries what you put in it.** The weaker, true version of the finding
+this note originally overstated: the structure and tokens travelled because the
+canvas held them, and the project's rules did not travel because nobody typed
+them. That is not a missing feature. It is an argument for project rules living
+in the repo, where `CLAUDE.md` already keeps them, rather than being retyped into
+a dialog each time a design is handed over.
 
 **"Use layout 2a" was typed by hand, not generated.** The canvas would not let
 us select a single artboard, so the share is scoped to the whole document and

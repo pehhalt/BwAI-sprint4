@@ -79,6 +79,29 @@ thing the exercise exists to teach you to produce.** A Python project fails it.
 A hand-written HTML site fails it. Any project without a mature front-end fails
 it — which is nearly every coursework project, and a good share of real ones.
 
+**Where the course text genuinely falls short**, stated narrowly now that the
+GitHub claim has been withdrawn:
+
+- **It never mentions React Native.** `/design-sync` is documented as needing
+  *"JavaScript/TypeScript component libraries (React, Vue, Svelte, JSX)"*. This
+  repo is TypeScript and React. It reads as supported and is not, because React
+  Native's components do not render in a browser. That is an easy trap and the
+  text does nothing to flag it.
+- **The troubleshooting table misdiagnoses our case.** It maps the
+  missing-component error to *"Non-JS/TS codebase structure"*, with the fix
+  *"Use Option A or Option B import routes"*. The remedy is right; the cause is
+  wrong. Ours is a JS/TS codebase with no component library, which the table does
+  not describe.
+- **The exercise suggests the project type that cannot satisfy its own first
+  success criterion.** It invites you to pick an existing project, naming a
+  *"mobile interface"* as an option, makes `/design-sync` the unconditional Step
+  1, and then requires *"design system created in Claude Design from actual
+  codebase components"*. For an Expo app — and this course has you build two —
+  those cannot all be true at once.
+
+None of that is contradicted by the GitHub correction. The routes were
+documented; the precondition for the *prescribed* route was not.
+
 ### Uploaded brand material beats an attached design system
 
 The create flow forces you to pick a preset theme before it accepts anything,
@@ -136,14 +159,25 @@ does not audit what the code does.
 So the right answer was **both**: connect the repo for the values, supply the
 guide for the judgement about them. Not one instead of the other.
 
-**It is not in the assignment.** The full course text was given to the session
-that wrote this README and the checklist, and the route inventory they were built
-from names only `/design-sync`, the codebase converter, and *Create here / upload
-existing brand material*. Connect GitHub appears in none of them. Worth stating
-plainly as a gap in the material: **the course prescribes a workflow that cannot
-run on this project, and the route that does work sits unmentioned in the same
-menu.** For a part whose subject is designing against a real codebase, that is
-the omission that cost the most time here.
+**It is in the assignment, and we missed it.** An earlier draft of this file
+claimed the course text omitted the GitHub route. It does not. Re-reading the
+text against this write-up, it appears twice, and the second time inside the very
+option we chose:
+
+> **Option B: upload a brand you already have.** Choose *Create here* to import
+> existing brand materials. Supported formats include:
+> **Connected tools: Figma links, GitHub repositories** · Codebases: Existing UI
+> packages and style guides · Design files · Documents · Assets
+
+So Option B offered two sub-routes — connect a repository, or upload files — and
+we took the second and never read the first line of the list. The text even
+carries the guidance we needed for it: *"For large codebases, attach front-end UI
+subdirectories instead of repository roots"*, which is exactly the "scope it to
+`part4`" problem we hit when testing it afterwards.
+
+That reclassifies the finding. It is **not** an omission in the material. It is
+our miss, in a list we had read, in the option we had already selected. The
+material's actual gap is narrower and sits elsewhere — see below.
 
 **The mistake underneath this one is the generalisable part.** Asked whether a
 GitHub link would have worked, I said no — reasoning from how `/design-sync`
@@ -174,12 +208,32 @@ for CSS. "The bundle beats a screenshot" is true here, by a narrower margin than
 the intended audience gets: we received a precise spec, a web team receives a
 running head start.
 
-**What did not travel.** The custom instructions were not in the generated
-prompt. Reuse the existing components, do not touch Wisdom or History, keep the
-key server-side — every one of those had to be restated by hand. The bundle
-answers *what does it look like* and says nothing about *what is this codebase
-not allowed to do*. `CLAUDE.md` remained the only thing carrying that, which is
-why it was extended before the build rather than after.
+**What did not travel — corrected.** An earlier version of this section said the
+custom-instructions field did not carry its contents. That was wrong, and the
+evidence was in our own handoff prompt: the line `Implement: Use layout 2a.` *is*
+the custom instruction, typed into that field and duly carried across. The field
+works.
+
+What actually happened is that the constraints — reuse the existing components,
+do not touch Wisdom or History, keep the key server-side — were drafted and then
+never entered; a shorter instruction was typed instead. So they had to be
+restated by hand in the session, and that was our doing, not the tool's.
+
+The narrower claim that survives: a handoff bundle carries what you put in it,
+and nothing about a project's rules travels unless someone types it. `CLAUDE.md`
+remained the thing actually carrying them, which is why it was extended before
+the build rather than after — but that is an argument for project rules living in
+the repo, not evidence of a missing feature.
+
+**The bundle we received was thinner than the documented one.** The text lists
+the handoff package as containing HTML/CSS/JS layout code, component hierarchy,
+exact tokens, rendered state previews, *screen annotations and chat decision
+logs*, and a *handoff README detailing recommended stack conventions*. Reading
+the project through the tool afterwards, there is no README in it — the files are
+the canvas document, the device frame, the runtime and the uploads. And no
+annotations existed to travel, because none were made (see *Where this fell
+short*). So two of the seven documented contents were absent, one because the
+tool did not produce it and one because we did not create it.
 
 **The selection did not travel either.** The canvas offered no way to scope the
 share to one artboard, so the handoff points at the whole document and the choice

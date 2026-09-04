@@ -78,8 +78,11 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
       is the wrong trade for this project.
 - [-] Option C (codebase converter) — **not available for this repo.** Reason
       documented rather than skipped silently.
-- [x] **Tested after the fact: `Connect GitHub` — a third route neither the course
-      text nor this checklist knew about, and the one we should have used.** It
+- [x] **Tested after the fact: `Connect GitHub` — a route this checklist did not
+      know about, though the course text did.** *Correction: an earlier version of
+      this entry called it absent from the assignment. It is listed under Option B,
+      the option we chose — "Connected tools: Figma links, GitHub repositories" —
+      so this was our miss inside a list we had read, not a gap in the material.* It
       sits in the same project-creation menu as *Attach file*, under *Code*:
       *"connect a codebase for Claude to design within."* Distinct from the CLI
       converter, and it is not blocked by React Native.
@@ -215,10 +218,13 @@ means the specification has to be written somewhere else or not at all.
 - [x] Share → Claude Code, target **Local agent**. Web session was rejected on
       purpose: it runs against the GitHub remote and cannot drive Expo or reach
       the phone, and device verification is the point of Phase 5.
-  - [-] **With custom instructions** — drafted, but they are **not** in the
-        generated prompt, so they were given to the agent in-session instead.
-        Recorded rather than quietly worked around: the bundle carries structure
-        and tokens and carries none of the project's rules.
+  - [~] **With custom instructions** — the field works and was used, just not for
+        the constraints. `Implement: Use layout 2a.` in the generated prompt *is*
+        the custom instruction, typed and carried across intact. The longer
+        constraints — reuse existing components, do not touch Wisdom or History,
+        keep the key server-side — were drafted and never entered, so they were
+        given to the agent in-session instead. *Corrected: an earlier version of
+        this entry blamed the tool for not carrying them.*
   - [!] **The artboard could not be selected.** The canvas offered no way to scope
         the share to one artboard, so the handoff points at the whole document and
         the choice is carried by a hand-typed line, `Implement: Use layout 2a`.
