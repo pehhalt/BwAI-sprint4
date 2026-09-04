@@ -109,3 +109,72 @@ not inheritance:
 Neither is a problem. Both are the kind of thing that is invisible in a
 screenshot handoff and explicit in a bundle handoff, which is the point the
 round trip was meant to demonstrate.
+
+---
+
+# The design against the built screen
+
+Phase 5. Design: 2a in
+[`screenshots/settings-three-variations.png`](./screenshots/settings-three-variations.png),
+rendered in a 402×874 frame. Built:
+[`part4/docs/screenshots/settings.PNG`](../../part4/docs/screenshots/settings.PNG),
+photographed on the actual phone with 24 real entries saved.
+
+**Divergence is a finding, not a failure.** Three of them, in descending order
+of how much they matter.
+
+## 1. About falls below the fold — and that was an argument for this layout
+
+On the phone, the About section is cut off after its first line. Everything
+below it needs a scroll.
+
+This is the uncomfortable one, because *"2b pushes About below the fold"* was
+one of the four reasons 2a won. On a real device 2a does it too. The argument
+was made against a 402×874 design frame and the frame flattered it.
+
+The screen is a `ScrollView`, so nothing is lost and this is not a compliance
+question — the AI-disclosure line lives on Wisdom and History, above their
+output, and the About block only explains why it is there. But the honest
+version of the Phase 3 rationale is: **2a fits more above the fold than 2b, not
+enough to fit everything.** The other three reasons for 2a — no new visual
+idea, About reading as page copy, the destructive action staying legible — all
+survive contact with the device unchanged.
+
+Not chased. Making About fit would mean tightening the 36px section rhythm the
+design specifies, which trades a faithful build for a marginal gain on
+reference text nobody reads twice.
+
+## 2. The hint lines wrap, so every radio row is taller than drawn
+
+"Something calm and genuinely useful" is one line in the design and two on the
+phone. Same for "Advice, right up until the last word". The design frame was
+402pt wide with 24pt padding; the real device is narrower once its own
+insets are taken, and `Type.label` at 17 plus `Type.caption` at 14 need more
+room than the mock allowed.
+
+This is the direct cause of divergence 1 — two extra text lines is roughly the
+About block's worth of vertical space. Worth knowing for the next screen: a
+design frame is a guess at a device, and text that fits on one line in the mock
+is the first thing to check on hardware.
+
+## 3. The tab bar icons are filled in the app and outlined in the design
+
+The design drew outline icons for all three tabs. The app uses `house.fill` and
+`clock.fill`, which predate this work, and the new `slider.horizontal.3` follows
+them. Not introduced by this build — but it means the design and the app
+disagree about the tab bar, and the design is the one that is wrong.
+
+## What matched exactly
+
+Everything else, and it is worth listing because this is the part a screenshot
+handoff would have got wrong:
+
+- `Settings` in the serif at `Type.title`, flush left
+- the small-caps section labels in `Palette.textMuted` at `Type.caption`, with
+  the letter spacing resolved from the design's `.06em`
+- the selected radio row: `Palette.accent` border over `Palette.accentSoft`
+  fill, 26/13/7 ring geometry
+- the unselected row on `Palette.surface` inside `Palette.border`
+- Clear history in `Palette.danger` with the live count beside it, on one
+  surface row
+- the 36px rhythm between sections, and 10px between the radio rows

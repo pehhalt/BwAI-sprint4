@@ -14,20 +14,33 @@ leaves the server side.
 
 ## What it looks like
 
-| Wisdom | History |
-| --- | --- |
-| <img src="docs/screenshots/wisdom.png" alt="The Wisdom screen: a Wise/Funny radio choice, an Ask Grandma button, and the AI-generated disclosure line" width="300"> | <img src="docs/screenshots/history.png" alt="The History screen: past wisdom listed newest first, each tagged with its mood and time" width="300"> |
+| Wisdom | History | Settings |
+| --- | --- | --- |
+| <img src="docs/screenshots/wisdom.png" alt="The Wisdom screen: a Wise/Funny radio choice, an Ask Grandma button, and the AI-generated disclosure line" width="300"> | <img src="docs/screenshots/history.png" alt="The History screen: past wisdom listed newest first, each tagged with its mood and time" width="300"> | <img src="docs/screenshots/settings.PNG" alt="The Settings screen: a default-tone radio choice, a Clear history row showing the saved count, and an About section" width="300"> |
 
 ## What it does
 
-Two screens, one AI feature.
+Three screens, one AI feature.
 
 | Screen | What's on it |
 | --- | --- |
 | **Wisdom** (`/`) | A Funny / Wise toggle, an "Ask Grandma" button, the wisdom card, and the AI-disclosure line |
 | **History** (`/history`) | Every piece of wisdom generated so far, newest first, with its mood and timestamp |
+| **Settings** (`/settings`) | The default tone the Wisdom screen opens on, a Clear history row with the saved count, and an About section |
 
 Nothing else. No accounts, no login, no server database.
+
+The two tone controls do different jobs, which is easy to misread. Settings
+decides which option is **checked when the app opens**; the toggle on the
+Wisdom screen decides what **this particular request** asks for. So changing
+the default takes effect at the next cold start, not the next tab switch, and
+overriding it on the Wisdom screen does not write anything back.
+
+Settings renders no AI output, so it carries no AI-disclosure line. Its About
+section explains the label the other two screens carry above their output — it
+is not a substitute for it. The Settings screen was designed in Claude Design
+and built from the exported handoff bundle; the design record is in
+[`../part5/docs/`](../part5/docs/).
 
 ## How it's wired
 

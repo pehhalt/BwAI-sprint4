@@ -211,11 +211,16 @@ means the specification has to be written somewhere else or not at all.
       `Tone` moved into `lib/history.ts` so it stops being declared twice.
       Blast radius held to what `CLAUDE.md` agreed: `index.tsx` reads the default
       on mount, `history.tsx` gives up its Clear button.
-- [~] Run it on the phone. **Done — the screen renders and looks as expected on
-      device.** Screenshot the real screen next to the design and note where they
-      diverge — divergence is a finding, not a failure. *Side-by-side still
-      outstanding; the two places to look are the serif title and the small-caps
-      tracking, since neither transferred mechanically.*
+- [x] Run it on the phone. **Renders correctly on device**, screenshot at
+      [`part4/docs/screenshots/settings.PNG`](../part4/docs/screenshots/settings.PNG)
+      and now in the part4 README. Compared against the design; three divergences
+      written up at the end of [`docs/design-log.md`](./docs/design-log.md). The
+      serif title and the small-caps tracking — the two things predicted to
+      diverge — both came through fine. **What actually diverged was the fold:**
+      the hint lines wrap to two lines on a real device, every radio row grows,
+      and About ends up below the fold. Which matters because "2b pushes About
+      below the fold" was one of the four arguments for picking 2a. Rationale
+      corrected rather than quietly left standing.
 - [x] `npx expo lint` clean — exit 0, no findings. `npx tsc --noEmit` also clean.
 - [ ] Review before merge (`/code-review`, plus the Task 2 verifier if it is ready
       by then — that is the natural pairing).
