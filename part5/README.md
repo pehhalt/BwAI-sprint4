@@ -235,10 +235,11 @@ annotations existed to travel, because none were made (see *Where this fell
 short*). So two of the seven documented contents were absent, one because the
 tool did not produce it and one because we did not create it.
 
-**The selection did not travel either.** The canvas offered no way to scope the
-share to one artboard, so the handoff points at the whole document and the choice
-rides on a hand-typed line: `Implement: Use layout 2a.` The mechanism meant to
-carry it did not; prose did.
+**The selection genuinely could not be scoped.** The canvas offered no way to
+share a single artboard, so the handoff points at the whole document and the
+choice rides on the same hand-typed line: `Implement: Use layout 2a.` This one is
+the tool's doing, not ours — there was no control to use. The mechanism meant to
+carry a selection did not exist; prose carried it.
 
 Two things in the design were also *not* inherited from the code and were
 therefore decisions rather than transfers: the `.06em` letter spacing on the
@@ -342,6 +343,37 @@ device. But it cost an argument: *"2b pushes About below the fold"* was one of
 four reasons 2a won, and on hardware 2a does it too. The honest version is that
 2a fits more above the fold, not everything. **Any argument resting on what sits
 above the fold is an argument that moves with the phone.**
+
+## What we got wrong
+
+Corrections are marked inline where they belong, but scattering them makes them
+easy to miss, so they are collected here too. Everything below was asserted in
+this folder and later disproved — twice by re-reading the assignment, once by
+re-reading our own evidence.
+
+| Claimed | Actually |
+| --- | --- |
+| The course text omits the GitHub route | It lists it twice, the second time as the first supported format under Option B — the option we chose |
+| The custom-instructions field does not carry its contents | It does. `Implement: Use layout 2a.` in our own handoff prompt *is* the custom instruction |
+| A GitHub link would not have helped | It would have. Pointed at the repo it read `theme.ts` correctly, and found things the hand-written guide missed |
+| The cold-start-only default tone was a defect | It is the specified behaviour — the review that flagged it did not have that context |
+| Pressed-opacity drift was fixed | It was deleted by accident during unrelated work. Nothing was fixed |
+
+**Three of the five are the same error**: reasoning confidently from one piece of
+evidence to a conclusion it did not cover. `/design-sync` refusing was treated as
+evidence about a different feature. A drafted instruction was assumed to have
+been sent. A refusal message was allowed to stand in for the whole assignment
+text.
+
+The correction came each time from going back to the primary source — the menu,
+the prompt, the course text — and never from re-reading our own reasoning. That
+is the part worth carrying forward: rechecking an argument tends to confirm it,
+and rechecking its source does not.
+
+**The git history is not corrected**, and honestly cannot be. Commit `acee1ae`
+and its predecessors assert the GitHub omission and the custom-instructions claim
+as fact; `750bc47` withdraws both. The wrong versions stay where they were
+written, which is what a history is for.
 
 ## Where this fell short
 
