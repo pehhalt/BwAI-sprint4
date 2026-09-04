@@ -3,9 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const STORAGE_KEY = 'grandmas-wisdom:history';
 const MAX_ENTRIES = 100;
 
+/** The two moods the app offers, shared by the wisdom, history and settings screens. */
+export type Tone = 'funny' | 'wise';
+
 export type WisdomEntry = {
   id: string;
-  tone: 'funny' | 'wise';
+  tone: Tone;
   text: string;
   createdAt: number;
   /**

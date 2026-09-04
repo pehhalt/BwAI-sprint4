@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -11,9 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
 import { apiUrl } from '@/lib/api';
-import { addEntry } from '@/lib/history';
-
-type Tone = 'funny' | 'wise';
+import { addEntry, type Tone } from '@/lib/history';
+import { readDefaultTone } from '@/lib/settings';
 
 const TONES: { value: Tone; label: string; hint: string }[] = [
   { value: 'wise', label: 'Wise', hint: 'Something calm and genuinely useful' },
@@ -26,6 +25,19 @@ export default function WisdomScreen() {
   const [wisdom, setWisdom] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Once, on mount, not on focus. This is the tone the screen *starts* on --
+  // re-reading every time the tab regains focus would silently undo a pick the
+  // user just made here.
+  useEffect(() => {
+    let active = true;
+    readDefaultTone().then((stored) => {
+      if (active) setTone(stored);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const UNREACHABLE = "Grandma couldn't be reached. Try again in a moment.";
 
