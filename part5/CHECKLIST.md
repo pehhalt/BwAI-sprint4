@@ -142,20 +142,47 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
 
 ### Phase 4 — Refine it, using all four mechanisms
 
-Each of these has to be demonstrated at least once, so use each for the job it is
-actually good at rather than forcing one tool to do everything.
+Each of these was meant to be demonstrated at least once. **Most were not.** The
+phase is recorded as it happened rather than reshaped to look complete — the
+three layouts came back close enough to build from, and the pull to hand off
+beat the discipline to refine first.
 
-- [ ] **Chat** — one structural change (sections, hierarchy, global spacing or theme).
-- [ ] **Inline comment** — one change aimed at a specific element on the canvas.
-- [ ] **Direct canvas edit** — one nudge, resize, realign or text edit by hand.
-- [ ] **Tweak control** — add at least one: section spacing, corner radius, or
-      accent colour. Screenshot the control.
-- [ ] **Annotations** — mark interactive behaviour: what each control does, and
-      what the pressed / disabled / empty states look like. These travel with the
-      handoff bundle.
-- [ ] Accessibility pass — contrast, text size, reading order for a screen reader,
-      and whether it still works on the app's existing surface colours. Worst first.
-- [ ] Screenshot the finished screen. Commit.
+- [x] **Chat** — one structural change (sections, hierarchy, global spacing or theme).
+      The only mechanism actually used, and it did the whole job: the three
+      layouts and their arrangement all came out of chat.
+- [-] **Inline comment** — not used. Nothing on the canvas needed a change
+      narrow enough to be worth aiming at one element.
+- [-] **Direct canvas edit** — tried, but on an earlier state of the canvas that
+      did not become the final export, so nothing of it survives in
+      `docs/design-system/exports/`. Counted as not demonstrated rather than
+      claimed on the strength of a memory.
+- [-] **Tweak control** — not used, so no control to screenshot.
+- [-] **Annotations** — not added to the canvas. The states they were meant to
+      carry were written down anyway, before designing, in the table at the end
+      of [`docs/prompts.md`](./docs/prompts.md), and all of them are implemented
+      in `app/(tabs)/settings.tsx`: radio selected / unselected / pressed, Clear
+      history enabled / pressed / disabled-because-empty, and the confirmation
+      with both its buttons. So the states were specified and shipped — they just
+      travelled in a markdown file rather than in the bundle.
+- [-] **Accessibility pass on the canvas** — not run there. Done in code instead
+      at build time: `radiogroup` and `radio` roles with `accessibilityState`,
+      a combined label per row so a screen reader reads the hint with the option,
+      the destructive row exposing `disabled` and carrying a hint that it asks
+      before deleting, and every colour pair inherited from `theme.ts`, whose
+      contrast was already measured when `textMuted` and `disclosure` were fixed.
+      Not equivalent to reviewing the design — a canvas pass would have caught
+      reading order and text sizing before they were built, not after.
+- [x] Screenshot the finished screen. Nothing was refined after the variations,
+      so 2a in
+      [`docs/screenshots/settings-three-variations.png`](./docs/screenshots/settings-three-variations.png)
+      *is* the finished design. A separate screenshot would show the same pixels.
+
+**What skipping this cost.** The handoff carried structure and tokens and no
+behaviour, which is exactly the gap annotations exist to close, and the gap got
+closed by hand in `prompts.md` and `CLAUDE.md` instead. Worth knowing before
+the next screen: the refinement phase is where a design stops being a picture
+and starts being a specification, and going straight from variations to build
+means the specification has to be written somewhere else or not at all.
 
 ### Phase 5 — Hand off and build
 
@@ -175,12 +202,26 @@ actually good at rather than forcing one tool to do everything.
       → [`docs/handoff-prompt.md`](./docs/handoff-prompt.md), verbatim, with the
       verification that the pointer resolves and that the export matches the live
       canvas byte for byte.
-- [ ] In `part4`: new branch, e.g. `feat/settings-screen`.
-- [ ] Build it from the bundle. Existing components where one fits; new ones only
-      where none does.
-- [ ] Run it on the phone. Screenshot the real screen next to the design and note
-      where they diverge — divergence is a finding, not a failure.
-- [ ] `npx expo lint` clean.
+- [x] In `part4`: new branch, e.g. `feat/settings-screen`. Created off `main`
+      after the Phase 2–3 docs were committed, so the design record and the
+      build sit in separate commits.
+- [x] Build it from the bundle. Existing components where one fits; new ones only
+      where none does. `app/(tabs)/settings.tsx`, plus `lib/settings.ts` for the
+      stored default tone. The radio row was lifted from `index.tsx` unchanged;
+      `Tone` moved into `lib/history.ts` so it stops being declared twice.
+      Blast radius held to what `CLAUDE.md` agreed: `index.tsx` reads the default
+      on mount, `history.tsx` gives up its Clear button.
+- [x] Run it on the phone. **Renders correctly on device**, screenshot at
+      [`part4/docs/screenshots/settings.PNG`](../part4/docs/screenshots/settings.PNG)
+      and now in the part4 README. Compared against the design; three divergences
+      written up at the end of [`docs/design-log.md`](./docs/design-log.md). The
+      serif title and the small-caps tracking — the two things predicted to
+      diverge — both came through fine. **What actually diverged was the fold:**
+      the hint lines wrap to two lines on a real device, every radio row grows,
+      and About ends up below the fold. Which matters because "2b pushes About
+      below the fold" was one of the four arguments for picking 2a. Rationale
+      corrected rather than quietly left standing.
+- [x] `npx expo lint` clean — exit 0, no findings. `npx tsc --noEmit` also clean.
 - [ ] Review before merge (`/code-review`, plus the Task 2 verifier if it is ready
       by then — that is the natural pairing).
 - [ ] Merge to `main`.
@@ -189,7 +230,19 @@ actually good at rather than forcing one tool to do everything.
 ### Phase 6 — Close the loop
 
 - [ ] Re-run `/design-sync` in `part4` after the merge, so the design system
-      reflects the shipped code rather than the design.
+      reflects the shipped code rather than the design. **Expect this to refuse
+      again, for the reason already documented in
+      [`docs/design-sync-findings.md`](./docs/design-sync-findings.md)** — nothing
+      about adding a third screen turns an Expo app into a browser-renderable
+      component library. Run it anyway and record the refusal: the course text
+      presents this step as routine, and "it does not work on React Native, in
+      either direction" is the finding this part of the exercise actually
+      produces.
+- [ ] Close the loop the way that *is* available: regenerate
+      `docs/design-system/style-guide.html` from the shipped code and re-upload
+      it, so the design system carries the two things the Settings screen added
+      — the small-caps section label and the disabled destructive row. A manual
+      version of the same loop, and worth saying out loud that it is manual.
 - [ ] Confirm in Claude Design that anything new — a new component, a new token —
       actually arrived.
 - [ ] Write the round trip up in the README: what survived the handoff intact,
@@ -200,7 +253,10 @@ actually good at rather than forcing one tool to do everything.
 - [ ] Design system created in Claude Design from actual codebase components
 - [ ] Rendered screen matches app typography, colour and spacing tokens
 - [ ] Three layout variations evaluated, selection rationale logged
-- [ ] Canvas annotations specify visual and state behaviours
+- [-] Canvas annotations specify visual and state behaviours — **not met.** No
+      annotations were added to the canvas. The state behaviours were specified
+      in `docs/prompts.md` and implemented, but not by this mechanism and not in
+      the bundle. See Phase 4.
 - [ ] Claude Code built the feature from the exported handoff bundle
 - [ ] Feature verified on a branch and merged
 - [ ] `/design-sync` re-run post-merge

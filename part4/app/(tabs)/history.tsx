@@ -1,10 +1,10 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
-import { clearHistory, readHistory, type WisdomEntry } from '@/lib/history';
+import { readHistory, type WisdomEntry } from '@/lib/history';
 
 function formatWhen(timestamp: number): string {
   return new Date(timestamp).toLocaleString(undefined, {
@@ -33,38 +33,11 @@ export default function HistoryScreen() {
     }, [])
   );
 
-  async function doClear() {
-    await clearHistory();
-    setEntries([]);
-  }
-
-  function confirmClear() {
-    const message = 'Clear history? This removes every saved piece of wisdom.';
-    // Alert.alert is a no-op on react-native-web, so on web the button would
-    // silently do nothing at all.
-    if (Platform.OS === 'web') {
-      if (window.confirm(message)) void doClear();
-      return;
-    }
-    Alert.alert('Clear history?', 'This removes every saved piece of wisdom.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Clear', style: 'destructive', onPress: () => void doClear() },
-    ]);
-  }
-
   return (
     <View style={[styles.screen, { paddingTop: insets.top + Spacing.lg }]}>
+      {/* Clearing lives on Settings now, so this header is just a title. */}
       <View style={styles.header}>
         <Text style={styles.title}>History</Text>
-        {entries.length > 0 && (
-          <Pressable
-            onPress={confirmClear}
-            accessibilityRole="button"
-            hitSlop={Spacing.sm}
-            style={({ pressed }) => pressed && styles.pressed}>
-            <Text style={styles.clear}>Clear</Text>
-          </Pressable>
-        )}
       </View>
 
       {/*
@@ -110,16 +83,13 @@ export default function HistoryScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
+  // Holds the title and its padding. It stopped being a two-child row when
+  // Clear moved to Settings, so the row layout came out with it.
   header: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
   },
   title: { fontSize: Type.title, fontFamily: Fonts.serif, color: Palette.text },
-  clear: { fontSize: Type.label, color: Palette.danger },
-  pressed: { opacity: 0.6 },
   list: { paddingHorizontal: Spacing.lg, gap: Spacing.md },
   listEmpty: { flexGrow: 1, justifyContent: 'center' },
   empty: {

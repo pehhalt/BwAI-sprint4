@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -11,9 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
 import { apiUrl } from '@/lib/api';
-import { addEntry } from '@/lib/history';
-
-type Tone = 'funny' | 'wise';
+import { addEntry, type Tone } from '@/lib/history';
+import { readDefaultTone } from '@/lib/settings';
 
 const TONES: { value: Tone; label: string; hint: string }[] = [
   { value: 'wise', label: 'Wise', hint: 'Something calm and genuinely useful' },
@@ -26,6 +25,25 @@ export default function WisdomScreen() {
   const [wisdom, setWisdom] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Once, on mount, not on focus. This is the tone the screen *starts* on:
+  // Settings decides what is checked when the app opens, and the picker here
+  // decides what this request asks for. Re-reading on focus would collapse that
+  // split by undoing a pick made on this screen.
+  const pickedHere = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    readDefaultTone().then((stored) => {
+      // The read is async, so a tap can land first. When it has, it wins --
+      // otherwise the stored default arrives late and silently overwrites it,
+      // which is the failure this effect exists to avoid.
+      if (active && !pickedHere.current) setTone(stored);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const UNREACHABLE = "Grandma couldn't be reached. Try again in a moment.";
 
@@ -81,10 +99,15 @@ export default function WisdomScreen() {
           return (
             <Pressable
               key={value}
-              onPress={() => setTone(value)}
+              onPress={() => {
+                pickedHere.current = true;
+                setTone(value);
+              }}
               disabled={loading}
               accessibilityRole="radio"
-              accessibilityState={{ selected, disabled: loading }}
+              // A radio's checked state comes from `checked`; with only
+              // `selected` set the row is never announced as checkable.
+              accessibilityState={{ checked: selected, selected, disabled: loading }}
               accessibilityLabel={`${label}. ${hint}`}
               style={({ pressed }) => [
                 styles.radioRow,

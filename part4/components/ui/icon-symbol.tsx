@@ -18,6 +18,7 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'clock.fill': 'history',
+  'slider.horizontal.3': 'tune',
 } as const satisfies Record<string, ComponentProps<typeof MaterialIcons>['name']>;
 
 /**
