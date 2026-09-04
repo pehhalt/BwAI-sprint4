@@ -175,12 +175,18 @@ actually good at rather than forcing one tool to do everything.
       → [`docs/handoff-prompt.md`](./docs/handoff-prompt.md), verbatim, with the
       verification that the pointer resolves and that the export matches the live
       canvas byte for byte.
-- [ ] In `part4`: new branch, e.g. `feat/settings-screen`.
-- [ ] Build it from the bundle. Existing components where one fits; new ones only
-      where none does.
+- [x] In `part4`: new branch, e.g. `feat/settings-screen`. Created off `main`
+      after the Phase 2–3 docs were committed, so the design record and the
+      build sit in separate commits.
+- [x] Build it from the bundle. Existing components where one fits; new ones only
+      where none does. `app/(tabs)/settings.tsx`, plus `lib/settings.ts` for the
+      stored default tone. The radio row was lifted from `index.tsx` unchanged;
+      `Tone` moved into `lib/history.ts` so it stops being declared twice.
+      Blast radius held to what `CLAUDE.md` agreed: `index.tsx` reads the default
+      on mount, `history.tsx` gives up its Clear button.
 - [ ] Run it on the phone. Screenshot the real screen next to the design and note
       where they diverge — divergence is a finding, not a failure.
-- [ ] `npx expo lint` clean.
+- [x] `npx expo lint` clean — exit 0, no findings. `npx tsc --noEmit` also clean.
 - [ ] Review before merge (`/code-review`, plus the Task 2 verifier if it is ready
       by then — that is the natural pairing).
 - [ ] Merge to `main`.
@@ -189,7 +195,19 @@ actually good at rather than forcing one tool to do everything.
 ### Phase 6 — Close the loop
 
 - [ ] Re-run `/design-sync` in `part4` after the merge, so the design system
-      reflects the shipped code rather than the design.
+      reflects the shipped code rather than the design. **Expect this to refuse
+      again, for the reason already documented in
+      [`docs/design-sync-findings.md`](./docs/design-sync-findings.md)** — nothing
+      about adding a third screen turns an Expo app into a browser-renderable
+      component library. Run it anyway and record the refusal: the course text
+      presents this step as routine, and "it does not work on React Native, in
+      either direction" is the finding this part of the exercise actually
+      produces.
+- [ ] Close the loop the way that *is* available: regenerate
+      `docs/design-system/style-guide.html` from the shipped code and re-upload
+      it, so the design system carries the two things the Settings screen added
+      — the small-caps section label and the disabled destructive row. A manual
+      version of the same loop, and worth saying out loud that it is manual.
 - [ ] Confirm in Claude Design that anything new — a new component, a new token —
       actually arrived.
 - [ ] Write the round trip up in the README: what survived the handoff intact,
