@@ -1,9 +1,26 @@
-# Codex CLI — OpenRouter provider, as described in the Part 5 course text.
-# Provider definitions must live in the user-level config; a project-local
-# config.toml ignores them.
+# Evidence copy of the Codex CLI configuration. Two files, both in ~/.codex/.
+#
+# No key appears here or in either real file. `env_key` names an environment
+# variable; OPENROUTER_API_KEY is set as a Windows *user* environment variable
+# so it survives closing the terminal, which a shell export does not. The
+# OpenAI side holds no key at all -- it authenticates through the ChatGPT
+# subscription via `codex login`.
+#
+# The two reviewers end up one flag apart:
+#
+#   codex exec "..."                 -> OpenAI, on the ChatGPT plan
+#   codex -p openrouter exec "..."   -> z-ai/glm-5.2, on OpenRouter
+#
+# Verified with codex-cli 0.153.2 on 2026-09-04.
 
-model_provider = "openrouter"
-model = "z-ai/glm-5.2"
+
+# ===========================================================================
+# ~/.codex/config.toml  -- base
+# ===========================================================================
+# Nothing here selects a provider, so Codex uses its own default (openai).
+# The openrouter provider is *defined* here rather than in the profile,
+# because provider definitions have to sit in the user-level config.
+# Confirmed: `codex doctor` reports "default model provider: openai".
 
 [model_providers.openrouter]
 name = "OpenRouter"
@@ -11,25 +28,49 @@ base_url = "https://openrouter.ai/api/v1"
 env_key = "OPENROUTER_API_KEY"
 wire_api = "responses"
 
-[projects.'c:\users\ehhal\appdata\local\temp\claude\c--projects-turingcollege-bwai-sprint4-part5\44adcd53-0f41-47a1-804f-d8b00c8e7474\scratchpad\codex-smoke']
-trust_level = "trusted"
+# The [projects.*] trust entries Codex writes for itself are omitted here.
 
-# ---------------------------------------------------------------------------
-# Evidence copy of ~/.codex/config.toml. The key is never in this file, or in
-# any file: env_key names the environment variable, and OPENROUTER_API_KEY is
-# set as a Windows *user* environment variable so it survives closing the
-# terminal. A shell export would not.
+
+# ===========================================================================
+# ~/.codex/openrouter.config.toml  -- the open-weight reviewer
+# ===========================================================================
+# Selected with `-p openrouter`. Only flips the provider and model; everything
+# else is inherited from the base config.
 #
-# Verified on 2026-09-04 with codex-cli 0.153.2:
+#   model_provider = "openrouter"
+#   model = "z-ai/glm-5.2"
 #
-#   wire_api = "responses"   WORKS against OpenRouter. The course text is
-#                            right and the risk we logged against it was
-#                            wrong. No need for "chat".
+# Confirmed working: a run with -p openrouter reports
+#   model: z-ai/glm-5.2
+#   provider: openrouter
+
+
+# ===========================================================================
+# Where the course text is out of date
+# ===========================================================================
 #
-#   model = "z-ai/glm-5.2"   The slug the course names does exist, and so
-#                            does a ":free" variant. The free one is not
-#                            usable: it returned 429 Too Many Requests after
-#                            Codex exhausted its internal retries.
+# 1. PROFILES MOVED. The text describes a [profiles.<name>] block inside
+#    config.toml. That does not exist in 0.153.2. `-p/--profile` takes a
+#    CONFIG_PROFILE_V2 and "layers $CODEX_HOME/<name>.config.toml on top of the
+#    base user config" -- a separate file. The structure above is that
+#    mechanism, working.
 #
-# Run with:  codex exec --sandbox danger-full-access "<prompt>"
-# See docs/verifier-findings.md for why that sandbox mode, and not a safer one.
+# 2. --profile IS NOT GLOBAL. It applies only to runtime commands: codex,
+#    exec, review, resume, queue, archive, delete, unarchive, fork, mcp,
+#    sandbox, debug prompt-input. `codex -p <name> doctor` is an error, which
+#    is easy to trip over while verifying a profile.
+#
+# 3. wire_api = "responses" IS CORRECT. The risk logged against it at the start
+#    of this part was wrong. OpenRouter serves /responses; "chat" was never
+#    needed.
+#
+# 4. THE MODEL SLUG EXISTS. z-ai/glm-5.2 is real, and so is z-ai/glm-5.2:free.
+#    The free variant is not usable for this: it returns 429 Too Many Requests
+#    after Codex exhausts its internal retries.
+#
+# 5. THE SANDBOX IS THE REAL TRAP, AND IS NOT MENTIONED AT ALL. On Windows,
+#    --sandbox read-only and --sandbox workspace-write both reject every
+#    CreateProcess, including `cmd.exe /c dir`, so the agent can reason but
+#    cannot look at anything. Only --sandbox danger-full-access works, which
+#    means reviewing a repo on Windows costs you the read-only guarantee.
+#    Mitigate with a clean, pushed working tree.

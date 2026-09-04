@@ -445,12 +445,28 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
       `z-ai/glm-5.2` exists, and so does `z-ai/glm-5.2:free`. The free one is
       unusable — 429 Too Many Requests after Codex exhausted its retries — so the
       real runs used the paid slug at roughly 4 cents each.
-- [!] Add the `[profiles.<name>]` block pointing at that slug. **The mechanism
-      changed and the course text is out of date.** In `0.153.2`, `-p/--profile`
-      takes a `CONFIG_PROFILE_V2` and *"layers `$CODEX_HOME/<name>.config.toml` on
-      top of the base user config"* — a separate file, not a `[profiles.x]` block.
-      With one provider there is nothing to switch between, so the model is set in
-      the base config and no profile was created.
+- [x] Add the `[profiles.<name>]` block pointing at that slug. **The mechanism
+      changed and the course text is out of date** — but the replacement works and
+      is now in use. In `0.153.2`, `-p/--profile` takes a `CONFIG_PROFILE_V2` and
+      *"layers `$CODEX_HOME/<name>.config.toml` on top of the base user config"* —
+      a separate file, not a `[profiles.x]` block.
+
+      Set up once there were two providers worth switching between:
+
+      | File | Role |
+      | --- | --- |
+      | `~/.codex/config.toml` | defines the openrouter provider, selects nothing → OpenAI by default |
+      | `~/.codex/openrouter.config.toml` | selects it → `codex -p openrouter` |
+
+      The provider is *defined* in the base config and only *selected* in the
+      profile, since provider definitions have to sit at user level. Verified end
+      to end: a run with `-p openrouter` reports `model: z-ai/glm-5.2`,
+      `provider: openrouter`; without it, `codex doctor` reports
+      `default model provider: openai`.
+- [x] **`--profile` is not a global flag.** It applies only to runtime commands —
+      `codex`, `exec`, `review`, `resume`, `queue`, `archive`, `delete`,
+      `unarchive`, `fork`, `mcp`, `sandbox`, `debug prompt-input`. `codex -p <name>
+      doctor` errors out, which is easy to trip over while verifying a profile.
 - [x] Copy the finished config to `docs/codex-config.toml` as evidence, with the
       key referenced by environment variable name only. →
       [`docs/codex-config.toml`](./docs/codex-config.toml)
@@ -507,10 +523,9 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 ### Task 2 success checklist (from the course text)
 
 - [x] Standalone Codex CLI installed and authenticated against OpenRouter
-- [~] User-level provider and profile mapped to an open-weight model — provider
-      yes, profile no. The `[profiles.x]` mechanism the course describes no longer
-      exists in `0.153.2`, and with a single provider there was nothing to switch
-      between.
+- [x] User-level provider and profile mapped to an open-weight model — both, in
+      the v2 form that replaced the `[profiles.x]` block the course text
+      describes. `codex -p openrouter` selects `z-ai/glm-5.2`.
 - [x] The independent open-weight agent runs and reads a real project
 - [x] Cross-model verification done: build and adversarial review on different
       model families — Claude built, `z-ai/glm-5.2` reviewed, and the two found
