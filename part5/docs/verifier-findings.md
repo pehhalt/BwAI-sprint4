@@ -151,3 +151,144 @@ before finishing the paragraph. Claude's rejected finding was wrong for a
 different reason — it lacked context it had no way to have. Neither is a clean
 win; both need triage, which is the actual cost of a second reviewer and the
 reason this document exists.
+
+---
+
+# Task 3 — the third reviewer
+
+`codex-plugin-cc`, OpenAI's plugin, running `gpt-5.6-sol` on the ChatGPT
+subscription. Same code, third opinion.
+
+## The plugin does not work on Windows, and fails as a pass
+
+`/codex:adversarial-review --base 1628c91 --background` returned:
+
+> Verdict: **approve**
+>
+> No substantive finding can be supported from the lightweight context alone.
+> The required read-only repository inspection was blocked by the execution
+> policy, so this is not affirmative evidence that the change is safe to ship.
+
+**An `approve` from a reviewer that opened no files.** The disclaimer is
+accurate and it sits *below* the verdict, so anyone reading the summary line
+concludes a third model signed the code off. Nothing signed anything off.
+
+The cause is the sandbox limitation already recorded against the standalone
+CLI, reappearing through the plugin — and the plugin cannot be configured
+around it. Every sandbox value in the plugin is a hardcoded literal:
+
+| Location | Value |
+| --- | --- |
+| `codex-companion.mjs:414` — **the adversarial-review call site** | `"read-only"` |
+| `codex-companion.mjs:491` — the task path | `write ? "workspace-write" : "read-only"` |
+| `lib/codex.mjs:68, 81, 1012` | `"read-only"` |
+
+No `--sandbox` flag, no config key, no environment override — the only
+variables the plugin reads anywhere are `CLAUDE_ENV_FILE`,
+`CLAUDE_PROJECT_DIR`, `CODEX_HOME` and `SHELL`. The string
+`danger-full-access` does not appear in the plugin at all. Its two reachable
+modes are exactly the two that Codex's Windows sandbox rejects.
+
+So on this platform the plugin cannot review a repository, and there is no
+supported way to make it. That is Task 3's real result.
+
+## The fallback
+
+Same model and same auth, run directly through the CLI at a sandbox that
+works, bypassing only the component shown to be broken:
+
+    Get-Content approach-prompt.txt -Raw | codex exec --sandbox danger-full-access -
+
+It is no longer a test of the plugin — the plugin's answer is already in — but
+it does produce the third opinion the comparison needs.
+
+## What it found, triaged
+
+Framed as the plugin frames it: challenge the approach, not hunt defects.
+
+### 1. Non-transactional history — **real bug, fixed**
+
+The only data-loss defect any of the three reviewers found.
+
+`addEntry` is read-modify-write and `clearHistory` is a delete, with nothing
+serialising them:
+
+    t0  fetch completes, addEntry reads N entries
+    t1  user confirms Clear, removeItem empties storage
+    t2  addEntry writes N+1 -- the cleared history is back
+
+Reachable by leaving the confirmation open while a request is in flight. The
+window is small; the consequence is a destructive action the user confirmed
+being silently undone, which is the kind of bug that is never reproduced and
+never believed.
+
+**Fixed:** both mutations now run through one queue in `lib/history.ts`. It
+chains off *settled* rather than resolved, so a failed write cannot wedge every
+write after it. Reads stay outside the queue — they do not mutate, and a stale
+count refreshes on focus.
+
+### 2. Storage collapses "empty" and "broken" — **real, fixed**
+
+The summary undersells this one; the sharp edge is in the detail. `readHistory`
+returned `[]` for a genuine empty history, a corrupt record, *and* a store that
+would not answer. Settings then showed **"Nothing saved yet" and disabled
+Clear** — so a user with corrupt storage was shown the only recovery action,
+greyed out.
+
+**Fixed:** `readHistoryState` returns `{ status: 'ready', entries }` or
+`{ status: 'unreadable' }`. Settings keeps Clear enabled when the store cannot
+be read, labels the row *"Saved wisdom cannot be read"*, and the confirmation
+stops claiming a count it cannot verify. `readHistory` is unchanged for the
+display path.
+
+### 3. `Tone` is owned by the history module — **real, minor, not fixed**
+
+`Tone` lives in `lib/history.ts` and is imported by settings and the wisdom
+screen. History stores a tone; it does not own the concept. Cheap to move, no
+behaviour attached, so it is recorded rather than done.
+
+### 4. No single owner for preference state — **valid critique, wrong for this project**
+
+Its headline scenario — change the default, return to Wisdom, see the old value
+— is the *specified* behaviour: Settings decides what is checked when the app
+opens, the picker decides what this request asks for. Its scaling argument is
+sound and `CLAUDE.md` rules out the scale that would make it bite.
+
+### 5. Fire-and-forget preference writes — **acknowledged tradeoff**
+
+`pickTone` sets state then writes without awaiting, deliberately, so the radio
+moves under the finger. Its counter is fair: a failed write means the next
+launch silently reverts. Left as it is, with the tradeoff now written down in
+two places instead of one.
+
+---
+
+# All three reviewers
+
+| | Framing | Findings | Real |
+| --- | --- | --- | --- |
+| Claude `/code-review` | defects in the diff | 5 | 4 |
+| `glm-5.2` open weight | defects in whole files | 5 | 2 fixed, 3 recorded |
+| `gpt-5.6` ChatGPT plan | approach and design | 5 | 2 fixed, 3 recorded |
+
+**Fifteen findings. No finding appears on more than one list.**
+
+That is a striking number and it needs its caveat stated rather than buried:
+**three different framings were used**, so some of the disjointness is by
+construction. Ask three reviewers three different questions and disjoint answers
+are not surprising. The fair claim is narrower and still worth having — framing
+and model together produced no overlap at all, and the reviewers were wrong in
+different directions:
+
+- Claude reviewed a diff, so a hardcoded hex outside it was invisible to it.
+- GLM read whole files and found that hex, but argued one finding from a
+  scenario the code makes impossible.
+- GPT-5.6 was asked about design and found the only bug that loses user data —
+  which neither defect-hunting pass caught, because it is invisible in any
+  single file and only appears when two operations interleave.
+
+**The most useful pattern across all three.** Two of GLM's findings were about
+code Claude's review caused. The worst bug found by anyone came from the
+reviewer asked the *least* specific question. And the reviewer that produced the
+most confident output — a bare `approve` — had read nothing at all. Confidence
+and framing turned out to matter as much as which model was answering.

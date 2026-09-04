@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Palette, Spacing, Type } from '@/constants/theme';
-import { clearHistory, readHistory, type Tone } from '@/lib/history';
+import { clearHistory, readHistoryState, type Tone } from '@/lib/history';
 import { readDefaultTone, writeDefaultTone } from '@/lib/settings';
 
 // The same strings the Wisdom screen offers, deliberately not reworded: two
@@ -26,7 +26,10 @@ const TONES: { value: Tone; label: string; hint: string }[] = [
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const [tone, setTone] = useState<Tone>('wise');
+  // Two facts, not one number: how much is saved, and whether we could read
+  // storage at all. Collapsing them is what disabled Clear on a corrupt store.
   const [saved, setSaved] = useState(0);
+  const [unreadable, setUnreadable] = useState(false);
 
   // The two effects below guard their own async work with a local flag, but
   // doClear runs from an Alert callback and has no cleanup to hang one on --
@@ -52,8 +55,10 @@ export default function SettingsScreen() {
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      readHistory().then((entries) => {
-        if (active) setSaved(entries.length);
+      readHistoryState().then((state) => {
+        if (!active) return;
+        setUnreadable(state.status === 'unreadable');
+        setSaved(state.status === 'ready' ? state.entries.length : 0);
       });
       return () => {
         active = false;
@@ -72,14 +77,17 @@ export default function SettingsScreen() {
     const wrote = await clearHistory();
     // Not setSaved(0): re-read, so the count reflects storage rather than an
     // assumption about it.
-    const remaining = (await readHistory()).length;
+    const state = await readHistoryState();
     if (!mounted.current) return;
-    setSaved(remaining);
+
+    const stillThere = state.status === 'unreadable' || state.entries.length > 0;
+    setUnreadable(state.status === 'unreadable');
+    setSaved(state.status === 'ready' ? state.entries.length : 0);
 
     // A destructive action that promised "it cannot be undone" and then did
     // nothing must say so. Showing the unchanged count is accurate but silent,
     // and silence after a confirmed delete reads as success.
-    if (!wrote || remaining > 0) {
+    if (!wrote || stillThere) {
       notify('Could not clear history', 'The saved wisdom is still on this phone.');
     }
   }
@@ -98,9 +106,13 @@ ${message}`);
 
   function confirmClear() {
     const title = 'Clear history?';
-    const message = `This removes all ${saved} ${
-      saved === 1 ? 'saying' : 'sayings'
-    } from this phone. It cannot be undone.`;
+    // The count is not trustworthy when storage would not parse, so the
+    // unreadable case gets its own wording rather than claiming a number.
+    const message = unreadable
+      ? 'The saved wisdom cannot be read, so this will erase whatever is stored. It cannot be undone.'
+      : `This removes all ${saved} ${
+          saved === 1 ? 'saying' : 'sayings'
+        } from this phone. It cannot be undone.`;
     // Alert.alert is a no-op on react-native-web, so on web the row would
     // silently do nothing at all.
     if (Platform.OS === 'web') {
@@ -113,7 +125,10 @@ ${message}`);
     ]);
   }
 
-  const nothingSaved = saved === 0;
+  // Clearing is the only way out of a corrupt store, so an unreadable read
+  // must not disable it -- that strands the user with a broken history and no
+  // way to reset it.
+  const nothingToClear = saved === 0 && !unreadable;
 
   return (
     <ScrollView
@@ -157,19 +172,23 @@ ${message}`);
       <Text style={[styles.sectionLabel, styles.sectionGap]}>History</Text>
       <Pressable
         onPress={confirmClear}
-        disabled={nothingSaved}
+        disabled={nothingToClear}
         accessibilityRole="button"
-        accessibilityState={{ disabled: nothingSaved }}
-        accessibilityHint={nothingSaved ? undefined : 'Asks you to confirm before deleting'}
+        accessibilityState={{ disabled: nothingToClear }}
+        accessibilityHint={nothingToClear ? undefined : 'Asks you to confirm before deleting'}
         style={({ pressed }) => [
           styles.clearRow,
-          pressed && !nothingSaved && styles.pressed,
+          pressed && !nothingToClear && styles.pressed,
         ]}>
-        <Text style={[styles.clearLabel, nothingSaved && styles.clearLabelDisabled]}>
+        <Text style={[styles.clearLabel, nothingToClear && styles.clearLabelDisabled]}>
           Clear history
         </Text>
         <Text style={styles.clearCount}>
-          {nothingSaved ? 'Nothing saved yet' : `${saved} saved`}
+          {unreadable
+            ? 'Saved wisdom cannot be read'
+            : nothingToClear
+              ? 'Nothing saved yet'
+              : `${saved} saved`}
         </Text>
       </Pressable>
 

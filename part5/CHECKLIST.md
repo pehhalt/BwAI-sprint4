@@ -544,10 +544,12 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 
 **Not blocked.** Bills separately through OpenAI.
 
-- [ ] `/plugin marketplace add openai/codex-plugin-cc`
-- [ ] `/plugin install codex@openai-codex`
-- [ ] `/reload-plugins`
-- [ ] `/codex:setup` — verifies local Codex dependencies and authentication.
+- [x] `/plugin marketplace add openai/codex-plugin-cc`
+- [x] `/plugin install codex@openai-codex`
+- [x] `/reload-plugins` — *4 plugins, 49 skills, 10 agents, 6 hooks.*
+- [x] `/codex:setup` — verifies local Codex dependencies and authentication.
+      `ready: true` on every check: node, npm, `codex-cli 0.153.2` with the
+      advanced runtime, and auth verified.
 - [x] Confirm the OpenAI key is picked up, and note whether it authenticated by
       key or by ChatGPT subscription. **Subscription, and no key exists.**
       `codex login status` reports *"Logged in using ChatGPT"*; `codex doctor`
@@ -558,12 +560,46 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
       gpt-5.6-sol`, `provider: openai`, while `codex -p openrouter exec` still
       resolves to `model: z-ai/glm-5.2`, `provider: openrouter`. **Three
       reviewers, two auth methods, one CLI.**
-- [ ] Run `/codex:adversarial-review` on the Task 1 changes before merge.
-- [ ] Compare the three reviewers — Claude, OpenAI, open-weight — on the same
+- [!] Run `/codex:adversarial-review` on the Task 1 changes before merge. **Run
+      after the merge, not before** — Task 2 and 3 were sequenced after Task 1
+      closed, so this reviewed `--base 1628c91` on `main` instead. Said plainly
+      rather than presented as if the order held.
+
+      **And it could not read the repository.** It returned `verdict: approve`
+      while stating that inspection was blocked by the execution policy —
+      an approval from a reviewer that opened no files, with the disclaimer
+      *below* the verdict. Same Windows sandbox limitation as the CLI, and the
+      plugin cannot be configured around it: every sandbox value in it is a
+      hardcoded `read-only` or `workspace-write`, the two modes Windows rejects.
+      `danger-full-access` appears nowhere in the plugin, and there is no flag,
+      config key or environment override.
+- [x] **Fallback run, so Task 3 still produces a third opinion.** Same model and
+      same ChatGPT auth, same approach-challenge framing, through
+      `codex exec --sandbox danger-full-access` — bypassing only the component
+      shown to be broken. Not a test of the plugin any more; the plugin's answer
+      is already in.
+- [x] Compare the three reviewers — Claude, OpenAI, open-weight — on the same
       diff. Which found what, and did any two agree on something all three should
-      have caught? That comparison is the actual value here.
-- [ ] Note the desktop-app caveat: there is no `/plugin` command there, plugins
-      install from + → Plugins. Do this from the terminal.
+      have caught? That comparison is the actual value here. →
+      [`docs/verifier-findings.md`](./docs/verifier-findings.md)
+
+      **Fifteen findings, no finding on more than one list.** No two agreed on
+      anything, so the "should all three have caught it" question has no
+      instances — which is itself the answer. Caveat stated rather than buried:
+      three *different framings* were used, so some disjointness is by
+      construction, not model diversity.
+
+      The result worth keeping: **the only data-loss bug came from the reviewer
+      asked the least specific question.** GPT-5.6 was asked about design, not
+      defects, and found that `addEntry` and `clearHistory` can interleave so a
+      confirmed clear is silently undone. Neither defect-hunting pass saw it,
+      because it is invisible in any single file. Fixed, along with storage
+      collapsing "empty" and "broken" into one answer — which had disabled the
+      Clear button exactly when corrupt storage made it the only thing worth
+      pressing.
+- [x] Note the desktop-app caveat: there is no `/plugin` command there, plugins
+      install from + → Plugins. Do this from the terminal. *Done from the
+      terminal; the caveat was never hit.*
 
 ---
 
