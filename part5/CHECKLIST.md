@@ -229,15 +229,42 @@ means the specification has to be written somewhere else or not at all.
 
 ### Phase 6 — Close the loop
 
-- [ ] Re-run `/design-sync` in `part4` after the merge, so the design system
-      reflects the shipped code rather than the design. **Expect this to refuse
-      again, for the reason already documented in
-      [`docs/design-sync-findings.md`](./docs/design-sync-findings.md)** — nothing
-      about adding a third screen turns an Expo app into a browser-renderable
-      component library. Run it anyway and record the refusal: the course text
-      presents this step as routine, and "it does not work on React Native, in
-      either direction" is the finding this part of the exercise actually
-      produces.
+- [x] Re-run `/design-sync` in `part4` after the merge, so the design system
+      reflects the shipped code rather than the design. **It refused again**, as
+      predicted, and created nothing: no project, no `.design-sync/config.json`,
+      no `DesignSync` call. All four gaps re-checked and still standing — no
+      `dist/`, no library entry, no `.storybook/` or `*.stories.*` anywhere, and
+      `components/` still holding only `haptic-tab.tsx` and the icon shim.
+      **So the loop does not close in either direction on this repo**, and a
+      third screen did not move it. That is the finding this step produces; the
+      course text presents it as routine.
+  - [!] **Confirmed on re-inspection, not independently reproduced.** Stated
+        plainly because it changes what the evidence is worth: the second run
+        read [`docs/design-sync-findings.md`](./docs/design-sync-findings.md)
+        first and honoured the prior decision rather than re-deriving it. It did
+        real work on top — re-verified the four gaps against today's repo, found
+        the Storybook absence independently, and caught two stale facts — but it
+        is a confirmation, not a clean second replication. Claiming the loop was
+        tested twice from scratch would overstate it.
+  - [x] Findings doc refreshed to match the shipped code, in a separate session
+        scoped to that one file. Screen count corrected, the `CLAUDE.md` quote
+        updated to the three-screen cap with a note that the argument survives
+        the amendment, and the two deferred findings re-triaged.
+  - [x] **Pressed-opacity drift resolved** — and the *way* it resolved is the
+        interesting part. Nobody fixed it. The `0.6` copy lived on History's
+        Clear button, Settings took that button over, and the divergent copy was
+        deleted as a side effect. `index.tsx:223` and `settings.tsx:249` now
+        agree at `0.85`. Convergence by luck, not by structure — a third copy
+        would diverge exactly the same way.
+  - [ ] **`<Disclosure />` extraction is now unclaimed rather than deferred.**
+        It was held back to avoid widening the Settings task; Settings has
+        merged, so that reason has expired. Still defined twice, and still with
+        different alignment — `index.tsx:157` centres it (`:247`),
+        `history.tsx:50` does not (`:127` pads it instead). Verified, not
+        recalled. Out of scope for Part 5, and worth its own change with its own
+        review: it touches the line `CLAUDE.md` treats as safety-critical, so
+        "always above its content" has to become a structural guarantee rather
+        than a convention each future agent remembers.
 - [ ] Close the loop the way that *is* available: regenerate
       `docs/design-system/style-guide.html` from the shipped code and re-upload
       it, so the design system carries the two things the Settings screen added

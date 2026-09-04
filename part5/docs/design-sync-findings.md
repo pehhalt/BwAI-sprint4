@@ -6,6 +6,15 @@ finding than a silent skip.
 
 Date: 2026-09-04. Target: [`part4`](../../part4), Expo SDK 57, Expo Router.
 
+**Re-verified 2026-09-04**, after the Settings screen merged. `/design-sync` was
+invoked again on `part4`; the skill's own rule is to honour prior state, so the
+four gaps below were re-checked against the repo rather than re-derived. All
+four still hold: no `dist/`, no library entry, no `.storybook/` and no
+`*.stories.*` anywhere, and `components/` still holds only `haptic-tab.tsx` and
+the `icon-symbol` platform shim. Nothing was created — no Claude Design project,
+no `.design-sync/config.json`, no `DesignSync` call. What did change is the
+screen count and one of the two deferred findings; both are marked inline below.
+
 ---
 
 ## What we tried, in order
@@ -35,7 +44,7 @@ library**. This app is a React Native phone app with its UI written inline.
 
 | The sync needs | This repo has |
 | --- | --- |
-| A component library with a public API | UI written inline in two screens |
+| A component library with a public API | UI written inline in the three screens |
 | A compiled `dist/` bundlable to `window.<global>.*` | No build step — Metro bundles the app, not a library |
 | Components that render in a browser DOM | React Native primitives (`View`, `Pressable`, `FlatList`) |
 | `styles.css` and token files reachable by `@import` | `StyleSheet.create` objects and a TS `Palette`/`Spacing`/`Type` module |
@@ -43,7 +52,7 @@ library**. This app is a React Native phone app with its UI written inline.
 Four gaps, in increasing order of difficulty:
 
 1. **No shared component layer.** Roughly six to eight extractable components
-   exist as duplication across the two screens — card surface, disclosure line,
+   exist as duplication across the screens — card surface, disclosure line,
    screen title, empty state, primary button, radio row, tone pill.
 2. **No library build.** A second build target would be needed: a library entry
    re-exporting the components, a bundler emitting a bundlable `dist/`, and
@@ -66,9 +75,12 @@ Four gaps, in increasing order of difficulty:
 
 **Do not close those gaps.** Adding a bundler, a web build target, a CSS token
 pipeline and a component library to satisfy a design tool is a large amount of
-machinery in a project whose `CLAUDE.md` says *"One AI feature, two screens"* —
-and the payoff would be mockups built from about seven components that fit on
-one screen anyway. The tool should serve the project, not the reverse.
+machinery in a project whose `CLAUDE.md` caps the app at *"One AI feature, three
+screens"* — and the payoff would be mockups built from about seven components
+that fit on one screen anyway. The tool should serve the project, not the
+reverse. (That rule read *two* screens when this was first written; Settings
+raised the cap to three by approved amendment. The argument is unchanged — a
+third screen does not make a component library worth building.)
 
 Instead we take **Option B** from the course text — *Create here*, uploading
 existing brand material — rather than **Option C**, the codebase converter. The
@@ -83,21 +95,33 @@ file is the note saying so.
 
 ## Two things the refusal surfaced that outlive this exercise
 
-Neither is part of the Part 5 deliverable. Both are recorded rather than acted
-on, so they are not lost.
+Neither is part of the Part 5 deliverable. Both were recorded rather than acted
+on, so they are not lost. As of the 2026-09-04 re-verification, one has since
+been resolved and one is still open.
 
-- **Pressed-opacity drift.** The pressed state is `0.85` on one screen and `0.6`
-  on the other. That is not a design decision, it is two copies that diverged —
-  precisely what a shared component prevents. Good candidate for the Task 2
-  cross-model verifier to find independently.
+- ~~**Pressed-opacity drift.**~~ **Resolved — incidentally, by the Settings
+  work.** The pressed state was `0.85` on one screen and `0.6` on the other; the
+  `0.6` belonged to the History screen's Clear button, which Settings took over
+  under the agreed blast radius. `history.tsx` now declares no pressed state at
+  all, and the two that remain agree: `app/(tabs)/index.tsx:223` and
+  `app/(tabs)/settings.tsx:249`, both `opacity: 0.85`.
+
+  Worth noting *how* it was resolved: not by anyone fixing the drift, but by
+  deleting one of the two copies for an unrelated reason. The underlying point
+  stands — the convergence is luck, not structure, and a third copy would
+  diverge the same way.
 - **A `<Disclosure />` component is worth extracting on its own merits.**
-  `CLAUDE.md` makes the AI-disclosure line mandatory on every screen rendering
-  AI output, above that output, and records a past audit failure about its
-  placement. It is currently defined twice, in two screens, with different
-  alignment. One component that always renders above its content is a stronger
-  guarantee than a convention repeated per screen and remembered by each future
-  agent.
+  **Still open.** `CLAUDE.md` makes the AI-disclosure line mandatory on every
+  screen rendering AI output, above that output, and records a past audit
+  failure about its placement. It is still defined twice — `index.tsx:157` and
+  `history.tsx:50` — in the two screens that render AI output, and the two
+  copies still disagree on alignment: `index.tsx:247` centres it,
+  `history.tsx:127` does not. One component that always renders above its
+  content is a stronger guarantee than a convention repeated per screen and
+  remembered by each future agent.
 
-  Deferred deliberately: the Settings screen renders no AI output, so it does
-  not need `<Disclosure />`, and doing the extraction now would widen a task
-  that already amends the project's scope rule once.
+  Deferred deliberately, and the deferral has outlived its original reason. It
+  was held back so as not to widen the Settings task, which was already amending
+  the project's scope rule once; Settings has since merged, and it renders no AI
+  output, so it neither needs `<Disclosure />` nor blocks the extraction any
+  more. The finding is now simply unclaimed work, not a deferred one.
