@@ -27,7 +27,11 @@ Legend: `[ ]` to do · `[x]` done · `[~]` in progress · `[-]` skipped, with re
       it.
 - [ ] Confirm the OpenRouter key from Part 4 is still valid and the spending cap
       is still in place.
-- [ ] Locate the OpenAI API key (Task 3 only).
+- [-] Locate the OpenAI API key (Task 3 only). **Not needed.** The course text
+      permits authenticating against a ChatGPT subscription, and the user has
+      Plus, so `codex login` was used instead of a key. Cheaper too: the plan is
+      already paid for, so the marginal cost is zero against roughly ten to forty
+      cents per review on an API key.
 - [x] Commit: the README and this checklist.
 
 ---
@@ -410,8 +414,11 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 - [x] **`codex doctor` exists and the course text predates it.** Diagnoses
       install, config, auth and runtime in one command, and it is how the missing
       key was confirmed. Worth running first, not last.
-- [ ] Note in the README that this is the *standalone CLI*, a different thing from
+- [x] Note in the README that this is the *standalone CLI*, a different thing from
       the plugin in Task 3. The course text warns about exactly this confusion.
+      Worth adding that they now share an auth store: `codex login` writes
+      `~/.codex/auth.json`, and the plugin shells out to the same binary, so the
+      subscription covers both.
 
 ### Phase 2 — Credentials
 
@@ -541,8 +548,16 @@ place nothing is attached to. That is not a workflow, it is an accumulation.
 - [ ] `/plugin install codex@openai-codex`
 - [ ] `/reload-plugins`
 - [ ] `/codex:setup` — verifies local Codex dependencies and authentication.
-- [ ] Confirm the OpenAI key is picked up, and note whether it authenticated by
-      key or by ChatGPT subscription.
+- [x] Confirm the OpenAI key is picked up, and note whether it authenticated by
+      key or by ChatGPT subscription. **Subscription, and no key exists.**
+      `codex login status` reports *"Logged in using ChatGPT"*; `codex doctor`
+      reports `stored auth mode: chatgpt`, `auth mode: chatgpt`,
+      `reachability mode: ChatGPT auth`. Auth lives in `~/.codex/auth.json`.
+
+      Verified end to end after login: `codex exec` resolves to `model:
+      gpt-5.6-sol`, `provider: openai`, while `codex -p openrouter exec` still
+      resolves to `model: z-ai/glm-5.2`, `provider: openrouter`. **Three
+      reviewers, two auth methods, one CLI.**
 - [ ] Run `/codex:adversarial-review` on the Task 1 changes before merge.
 - [ ] Compare the three reviewers — Claude, OpenAI, open-weight — on the same
       diff. Which found what, and did any two agree on something all three should
