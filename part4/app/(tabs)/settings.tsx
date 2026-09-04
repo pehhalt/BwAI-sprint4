@@ -184,11 +184,7 @@ ${message}`);
           Clear history
         </Text>
         <Text style={styles.clearCount}>
-          {unreadable
-            ? 'Saved wisdom cannot be read'
-            : nothingToClear
-              ? 'Nothing saved yet'
-              : `${saved} saved`}
+          {unreadable ? 'Cannot be read' : nothingToClear ? 'Nothing saved' : `${saved} saved`}
         </Text>
       </Pressable>
 
@@ -283,9 +279,18 @@ const styles = StyleSheet.create({
   // and fading Palette.textMuted to 60% takes "Nothing saved yet" from 6.35:1
   // on surface to roughly 3:1. That line is the only thing explaining why the
   // row is inert, so it is the last thing that should get hard to read.
-  clearLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.danger },
+  // The action keeps its width; the status text gives way. React Native does
+  // not shrink a Text inside a row on its own, so without these the longest
+  // status ran outside the card rather than wrapping inside it -- and it gets
+  // longer again at larger system font sizes.
+  clearLabel: { fontSize: Type.label, fontWeight: '600', color: Palette.danger, flexShrink: 0 },
   clearLabelDisabled: { color: Palette.textMuted },
-  clearCount: { fontSize: Type.caption, color: Palette.textMuted },
+  clearCount: {
+    fontSize: Type.caption,
+    color: Palette.textMuted,
+    flexShrink: 1,
+    textAlign: 'right',
+  },
 
   about: {
     fontSize: Type.body,
