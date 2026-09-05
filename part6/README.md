@@ -166,7 +166,32 @@ So the session must pass `managed_payments: { enabled: false }`. The Stripe Node
 types this field, so no cast is needed. Nothing in the lesson, and nothing in most training
 data, mentions it.
 
-### Finding 6 — the skills install to `.agents/skills/`, not `.claude/skills/`
+### Finding 6 — installing the skills does not mean they were used
+
+Requirement 2 of the sprint brief, and Steps 1–2 of this lab, are satisfied: both skill sets
+were installed before any code was written, and the Payload skills are committed to the
+repository so the version they were built against is recorded.
+
+Whether they were *used* is a separate question, and the honest answer is that there is no
+evidence they were. Every implementation task named the skill files explicitly in its brief,
+by path — `reference/COLLECTIONS.md`, `FIELDS.md`, `ACCESS-CONTROL.md`, `ADAPTERS.md`,
+`HOOKS.md`, `QUERIES.md` — and instructed the agent to prefer them over its training data.
+Not one of the twelve task reports mentions consulting one.
+
+The circumstantial evidence cuts both ways. The Payload code is idiomatic for version 3 —
+the right access shape, `upload: true`, Local API writes with `overrideAccess`, a correctly
+configured storage plugin — which is consistent with the skill having been read and equally
+consistent with adequate training data. Against that, several problems in Findings 1–5 are
+exactly the kind of thing current guidance exists to prevent, and the Stripe plugin gave no
+warning about Managed Payments (Finding 5), which breaks this lab's own checkout step.
+
+This lesson predicts the outcome itself. Its screenshot caption reads: *"Asked to deploy to
+Vercel, Claude Code loads the Payload skill but no Vercel one: skill use is not guaranteed."*
+That is the finding, confirmed. Installing a skill makes it available, and naming it in a
+prompt makes it likelier, but neither makes it certain — and nothing in the workflow reports
+back whether it actually happened, which is the part worth knowing.
+
+### Finding 7 — the skills install to `.agents/skills/`, not `.claude/skills/`
 
 The lesson says the Payload skills "land in a `.claude/skills/` folder". They actually land
 in `.agents/skills/`, symlinked for Claude Code. Minor, but it matters if you go looking for
