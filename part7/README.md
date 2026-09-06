@@ -33,14 +33,14 @@ instruction leads you into a failure.
 
 | Step | Status |
 |---|---|
-| 5. Add a "Production rules" section | ❌ **Not done** — see Gaps |
-| 6. Confirm it landed | ❌ Not done |
+| 5. Add a "Production rules" section | ✅ Done — PR #8, *"Write the production rules down, and bind the agent to them"*. Written after this file first recorded the gap; see Gap 1 for what it cost to find out the hard way |
+| 6. Confirm it landed | ✅ Done — the block is in `CLAUDE.md` and has bound every session since |
 
 ### Part 3 — Ship a change to the sandbox
 
 | Step | Status |
 |---|---|
-| 7. Make the change on a feature branch | ✅ Done, seven times (PRs #1–#7) |
+| 7. Make the change on a feature branch | ✅ Done, eighteen times (PRs #1–#23, of which five are promotions) |
 | 8. Merge the pull request into `main` | ✅ Done |
 | 9. Watch the deployment run | ✅ Done |
 | 10. Open the sandbox preview and check | ✅ Done, verified by fetching the deployed pages rather than by eye |
@@ -49,8 +49,8 @@ instruction leads you into a failure.
 
 | Step | Status |
 |---|---|
-| 11. Open a pull request from `main` into `production` | ⚠️ **Partially** — promotion was a direct merge, not a pull request. See Gaps |
-| 12. Merge into production | ✅ Done (by merge, not PR) |
+| 11. Open a pull request from `main` into `production` | ✅ Done — every promotion since PR #11 has been a pull request (#11, #13, #17, #21, #23). The first two promotions were direct merges; see Gap 2 |
+| 12. Merge into production | ✅ Done — and merged by the human, not the agent |
 | 13. Watch the production deploy | ✅ Done |
 | 14. Confirm the change on the live site | ✅ Done |
 
@@ -68,9 +68,14 @@ instruction leads you into a failure.
 
 ---
 
-## Gaps
+## Gaps — and how they were closed
 
-### 1. No "Production rules" block in CLAUDE.md — and two of its rules were broken
+Three of the four gaps this file first recorded are now closed. They are kept rather than
+deleted, because a gap that was real and then fixed is more useful than a tidy list, and
+because two of them were closed only *because* writing them down made them impossible to
+keep ignoring.
+
+### 1. No "Production rules" block in CLAUDE.md — and two of its rules were broken ✅ Closed
 
 Part 2 of the lab asks for a specific block:
 
@@ -78,12 +83,12 @@ Part 2 of the lab asks for a specific block:
 > - **Never merge a pull request yourself. I will check the preview and merge it.**
 > - Never run commands that could delete or overwrite the production database.
 
-That block was never written, and the project's actual workflow violated the middle rule
-consistently: **the agent opened and merged all seven pull requests itself**, and merged
-`main` into `production` without asking.
+That block was not written at first, and the project's early workflow violated the middle
+rule consistently: **the agent opened and merged pull requests #1 through #7 itself**, and
+merged `main` into `production` without asking.
 
 That was not accidental — the session ran in an agent-driven mode where a plan was approved
-up front and executed — but it is a real divergence from what this lesson teaches, and the
+up front and executed — but it was a real divergence from what this lesson teaches, and the
 lesson is right about why it matters. The rule exists so that a human sees a change running
 before users do.
 
@@ -92,26 +97,43 @@ commit ever went directly to `main`, and a production-database guard was built i
 script specifically to make the third rule enforceable rather than merely intended. When
 that guard later blocked the agent from seeding production, it worked exactly as designed.
 
-**To close:** write the block, and adopt the merge rule for the remaining work.
+**Closed by PR #8**, which wrote the block and went further than the lab asks: it adds a rule
+that production is promoted only through a pull request the human merges, forbids creating
+content in production to make a check pass, and explains *why the merge rule matters most* —
+the other rules prevent an accident, that one preserves a checkpoint. Every session since has
+been bound by it. On day 4 the agent opened four pull requests (#20–#23) and merged none of
+them; the owner merged all four.
 
-### 2. Production promotion was a merge, not a pull request
+### 2. Production promotion was a merge, not a pull request ✅ Closed
 
-Lab step 11 asks for a pull request from `main` into `production`. The project used a direct
-`git merge main && git push` on the `production` branch.
+Lab step 11 asks for a pull request from `main` into `production`. The first two promotions
+used a direct `git merge main && git push` on the `production` branch.
 
 The sprint brief only requires that merging `main` into `production` deploys the live site,
-which this satisfies, and the merge is visible in the history. But the lab's version is
+which that satisfied, and the merges are visible in the history. But the lab's version is
 better: a pull request gives the promotion a reviewable moment, which is the entire reason
 for separating the two branches.
 
-**To close:** promote via a pull request from here on.
+**Closed from PR #11 onward.** Every promotion since has been a pull request — #11, #13, #17,
+#21, #23 — and the rule is now written into `CLAUDE.md` rather than merely observed.
 
-### 3. Instant rollback never rehearsed
+### 3. Instant rollback never rehearsed ✅ Closed
 
-The lesson covers instant rollback as production's undo button. It is listed as an optional
-task in the sprint project and has not been done yet — scheduled for day 3.
+**Rehearsed on day 3, against the live site**, and written up in
+[`docs/rollback-rehearsal.md`](https://github.com/pehhalt/overprint-shop/blob/main/docs/rollback-rehearsal.md).
+The shop name was broken deliberately (PR #10), promoted to production (#11), recovered with
+Vercel's instant rollback, then properly reverted (#12, #13).
 
-### 4. The areas the lesson names as "still to learn"
+Two findings came out of it that the lesson does not mention, and they are the reason the
+rehearsal was worth doing rather than reading about: **CI passed on the broken change**, and
+**the rollback fixed the deployment while leaving the repository broken** — so the next
+deploy would have shipped the break again. Rollback buys time; it does not undo a commit.
+
+The rehearsal is also where the standing instruction came from that a deployment must be
+checked as *current*, not merely as healthy: a domain alias can stay pinned to an older
+deployment that answers 200 perfectly well.
+
+### 4. The areas the lesson names as "still to learn" ⬜ Still open
 
 Backups, custom domain, scaling, cost control, observability, and incident response are all
 untouched. The lesson frames these as beyond its scope, so this is not a gap against the
@@ -241,23 +263,32 @@ The alias is assigned as a step inside `deploy-preview.yml`.
   still tracked. A tool-rewritten config cannot carry that invariant; a check can.
 - **A production-database guard** in the seed script that fails closed, refusing to run
   unless the target is provably the development project.
-- **39 tests**, with CI running the database-free subset so that no database credential ever
+- **79 tests**, with CI running the database-free subset so that no database credential ever
   enters GitHub's secrets.
 
 ---
 
 ## The honest summary
 
-Part 7's technical content is covered thoroughly and in places exceeded. Its *behavioural*
-content — the CLAUDE.md rules, and specifically "never merge a pull request yourself" — is
-what this project did not adopt, and it is the gap most worth closing, because that rule is
-what keeps a human in the loop before users see a change.
+Part 7's technical content was covered thoroughly and in places exceeded from the start. Its
+*behavioural* content — the CLAUDE.md rules, and specifically "never merge a pull request
+yourself" — is what this project did not adopt at first, and it was the gap most worth
+closing, because that rule is what keeps a human in the loop before users see a change.
 
-The lesson's own warning applies neatly:
+It is closed now. The block was written on day 3 (PR #8), and day 4 ran entirely under it:
+the agent opened four pull requests and merged none, and the owner checked the sandbox before
+merging each one.
+
+That turned out to matter more than a compliance checkbox. On day 4 the owner refused to
+merge because the sandbox was returning 500 — which led to finding that running `payload
+migrate` locally had renamed a column in the database the sandbox deployment reads, while the
+sandbox still ran the old code that queried the old name. An agent merging on its own
+judgement would have shipped through that signal rather than stopping at it. The lesson's own
+warning:
 
 > *Without it, an agent working quickly can push straight to production before you have seen
 > the result.*
 
-That caused no harm here, because every deploy was verified afterwards and the two graded
-demonstrations were run by hand. But "verified afterwards" is a weaker guarantee than "seen
-before", and the difference is exactly what this lesson is about.
+The earlier version of this file said that caused no harm, because every deploy was verified
+afterwards and the graded demonstrations were run by hand. That was true then. It is a weaker
+guarantee than "seen before", and day 4 is the day the difference showed up.

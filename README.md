@@ -1,6 +1,13 @@
 # BwAI — Sprint 4
 
-Coursework for Sprint 4 of the Building with AI course. Five parts, each in its own folder.
+Coursework for Sprint 4 of the Building with AI course. Seven parts and the sprint project,
+each in its own folder.
+
+**The sprint project is the shop**, and its code is in a separate repository:
+[github.com/pehhalt/overprint-shop](https://github.com/pehhalt/overprint-shop) —
+live at [overprint-shop.vercel.app](https://overprint-shop.vercel.app).
+[sprint-project](./sprint-project) explains why the code sits outside this repository and
+holds the planning artefacts that produced it.
 
 ## [part1](./part1) — Agent skills
 
@@ -56,3 +63,25 @@ came from one that had read nothing at all.
 See [part5/README.md](./part5/README.md), and
 [part5#using-the-codex-cli-in-later-parts](./part5/README.md#using-the-codex-cli-in-later-parts)
 for how to reuse the Codex CLI setup in later sprints.
+
+## [part6](./part6) — Building a CMS and integrating payments
+
+No code of its own. This lesson's two halves — an owner-editable CMS catalogue and Stripe
+Checkout confirmed by a verified webhook — were built inside the sprint project instead, so
+they were exercised once in a deployed application rather than twice in a throwaway lab.
+[part6/README.md](./part6/README.md) records what the shop covers of the lab, what it does
+not, and seven findings the lesson does not warn you about — including that its own Checkout
+call now fails on a current Stripe account.
+
+## [part7](./part7) — Building production systems
+
+Also no code of its own, for the same reason: the pipeline was built once, for real, carrying
+an application people can visit. [part7/README.md](./part7/README.md) records the coverage,
+eight findings, and — more usefully — four gaps this project had against the lesson, three of
+which are now closed. The one worth reading is the behavioural one: the project did not adopt
+"never merge a pull request yourself" until day 3, and day 4 is where that rule earned itself.
+
+## [sprint-project](./sprint-project) — Overprint, the shop
+
+The graded deliverable. The folder holds the two design documents and two implementation
+plans; the code, the history and the deploy pipeline live in the shop's own repository.
