@@ -34,7 +34,7 @@ pipeline, and a live URL a reviewer can visit.
 | 3. Scaffold the Payload app | ⚠️ Deviated | See "Finding 1" — `create-payload-app` could not run, and the `website` template was not used |
 | 4. Connect a development Supabase project | ✅ Exceeded | Two projects, not one: `overprint-dev` and `overprint-prod`, with `DATABASE_URI` scoped per environment. See "Finding 2" for the connection-string trap |
 | 5. Log into the admin panel, create the first user | ✅ Done | Separate admin users for development and production |
-| 6. Describe a Products collection | ✅ Done | `name`, `slug`, `price`, `description`, `photo`, `soldOut`; access is "anyone can read, only a logged-in admin can write" — exactly the lab's phrasing, written as a tested unit in `src/access/index.ts` |
+| 6. Describe a Products collection | ✅ Done | `name`, `slug`, `price`, `description`, `image`, `soldOut` (the field was renamed from `photo` on day 4 — the old name asserted photographic authenticity the images do not have); access is "anyone can read, only a logged-in admin can write" — exactly the lab's phrasing, written as a tested unit in `src/access/index.ts` |
 | 7. Add products through the admin panel | ✅ Done | Four real products created in the production admin panel |
 | — *success check: editing a price changes the site with no redeploy* | ✅ **Proven by timing** | Products were created after the last deployment, with no workflow run in between, and appeared live immediately |
 | 8. Add Stripe test keys | ✅ Done | `sk_test_`/`pk_test_` in `.env` and both Vercel environments; verified against Stripe's API returning `livemode: false` |
@@ -70,7 +70,7 @@ leaving nothing to show.
 | Describe Payload's concepts well enough to direct an agent | ✅ Collections, fields, admin panel, media uploads and access control were all specified in plain language and built from those descriptions |
 | Connect Payload to Supabase through an environment variable, using a development project | ✅ Exceeded — two projects, verified separate by connecting to both |
 | Explain hosted Checkout, complete a sandbox purchase, explain why the webhook is the only trustworthy signal | ✅ Done, and enforced in code: the success page has no authority and cannot mark anything paid |
-| Describe what changes when switching from sandbox to live | ⬜ **Not yet written** — this is a sprint-project optional task ("a written go-live plan") scheduled for day 3 |
+| Describe what changes when switching from sandbox to live | ✅ Written — [`docs/go-live-plan.md`](https://github.com/pehhalt/overprint-shop/blob/main/docs/go-live-plan.md) in the shop repository. A plan, not a log: nothing in it has been executed, and the shop stays in sandbox |
 
 ---
 
@@ -88,7 +88,6 @@ leaving nothing to show.
   minor units regardless. A deliberate deviation, not an omission.
 - **The `cms-migration` skill.** Installed but never used — there was no existing site to
   migrate content from.
-- **The go-live plan** (see above), scheduled for day 3.
 
 ---
 
@@ -136,9 +135,9 @@ risk in a payment path.
 ### Finding 4 — media uploads do not work on Vercel with Payload's defaults
 
 Payload's default upload storage writes to the local filesystem. Vercel's is read-only and
-ephemeral, so product photos vanish. The fix is a storage adapter
+ephemeral, so product images vanish. The fix is a storage adapter
 (`@payloadcms/storage-vercel-blob`) with **`clientUploads: true`**, because Vercel caps
-server uploads at 4.5 MB and a product photo will exceed it.
+server uploads at 4.5 MB and a product image will exceed it.
 
 This affects the lesson's own success check: "editing a product's price in the admin panel
 changes it on the site" works fine locally with default storage, and the photo half of it
@@ -208,15 +207,36 @@ than the lab:
   and distinct `PAYLOAD_SECRET` per environment
 - **Schema managed by migrations in every environment** (`push: false`), so production's
   schema comes only from committed migrations
-- **Orders closed to every HTTP write path** — the webhook is the only writer, through
-  Payload's Local API
-- **Line items snapshot the product name and unit price at purchase**, so editing a price
-  cannot rewrite what a customer was charged
+- **Orders writable only where it is safe** — `create` and `delete` are closed to every HTTP
+  path, and of the twelve fields on an order only `fulfilmentStatus` can be written by a
+  logged-in admin. The other eleven, including `status`, `paidAt` and `amountTotal`, close
+  themselves with field-level access, so the verified webhook remains the only thing that can
+  mark an order paid
+- **Line items snapshot the product name, unit price and size at purchase**, so editing a
+  price cannot rewrite what a customer was charged
 - **Idempotent webhook handling**, since Stripe retries deliveries
 - **A compensating action**: if the order write fails after a Stripe session exists, the
   session is expired so it cannot be paid
-- **39 tests**, using Stripe's real signing helper and the real database rather than mocks
+- **79 tests**, using Stripe's real signing helper and the real database rather than mocks
 - **A CI/CD pipeline** where the workflow is the only thing that deploys
+
+A second pass on day 4 added things the lab does not reach at all, driven by three audits
+rather than by the brief:
+
+- **A size on every order**, validated server-side by exact match and snapshotted on the
+  order line — the client is not trusted for it, exactly as it is not trusted for price
+- **A shipping address**, collected by Stripe and read back from
+  `collected_information.shipping_details`. Stripe moved that field in its Basil API version
+  and the old top-level path silently yields `undefined`, so the shop has a test that feeds
+  the *old* shape and asserts nothing is stored
+- **A fulfilment workflow** the owner can operate without weakening payment integrity
+- **A visible "AI-generated image" caption**, server-rendered beneath each product image and
+  driven by a per-image provenance field rather than hardcoded — the EU AI Act's Art. 50(4)
+  disclosure duty applies to the person looking at the image, not to a policy page
+- **A legal and privacy page** that claims only what the code actually does. It was rewritten
+  three times in review for saying otherwise
+- **Export, erasure and retention scripts** for data-subject rights, behind a guard that
+  refuses to run unless it can prove it is pointed at the development database
 
 ---
 
@@ -231,3 +251,6 @@ than the lab:
 | Hosted Checkout | `src/app/(frontend)/shop/checkout/route.ts` |
 | The webhook | `src/app/(frontend)/shop/stripe-webhook/route.ts` |
 | The success page that decides nothing | `src/app/(frontend)/order/success/page.tsx` |
+| The AI-disclosure caption | `src/app/(frontend)/ProductImage.tsx` |
+| The legal and privacy page | `src/app/(frontend)/legal/page.tsx` |
+| Data-subject rights tooling | `src/lib/order-admin.ts`, `scripts/export-order.ts`, `erase-order.ts`, `prune-orders.ts` |

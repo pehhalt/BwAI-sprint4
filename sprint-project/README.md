@@ -34,7 +34,7 @@ to read. A git submodule was considered and rejected: anyone who clones without
 ## What was built
 
 A small print-on-demand t-shirt shop. The owner signs into an admin panel and manages the
-catalogue — name, price, description, mockup photo. A visitor browses, picks a shirt, and
+catalogue — name, price, description, product image. A visitor browses, picks a shirt, and
 pays through Stripe's hosted Checkout in sandbox. **The order is marked paid only when
 Stripe's own signed webhook confirms it.**
 
@@ -45,6 +45,12 @@ nothing is sold.
 Print-on-demand is the shop's premise, not an integration — no fulfilment provider is
 contacted.
 
+A second pass, planned and executed on day 4, turned a shop that could take money into one
+that could plausibly deliver and be lawful to run: a size on every order, a German shipping
+address collected at Checkout, a fulfilment status the owner can set without being able to
+hand-edit an order to *paid*, a visible "AI-generated image" label on the product images, a
+legal and privacy page, and operator scripts for GDPR export, erasure and retention.
+
 ---
 
 ## Planning artefacts in this folder
@@ -53,6 +59,8 @@ contacted.
 |---|---|
 | [`docs/superpowers/specs/2026-09-04-shop-design.md`](docs/superpowers/specs/2026-09-04-shop-design.md) | The design, written and committed before any code. Includes the decisions taken and, more usefully, the alternatives rejected and why |
 | [`docs/superpowers/plans/2026-09-04-shop.md`](docs/superpowers/plans/2026-09-04-shop.md) | The implementation plan: 19 tasks across three days, each with its own verification |
+| [`docs/superpowers/specs/2026-09-06-shop-completion-design.md`](docs/superpowers/specs/2026-09-06-shop-completion-design.md) | The second design: fulfilment, legal pages and AI disclosure. Argues from three audits and records the positions taken, including the ones that are deliberate rather than complete |
+| [`docs/superpowers/plans/2026-09-06-shop-completion.md`](docs/superpowers/plans/2026-09-06-shop-completion.md) | The second plan: 12 tasks in four phases |
 
 Both are copied into the shop repository too, so it stands alone for a reviewer.
 
@@ -70,7 +78,8 @@ commit history rather than silently patched.
 |---|---|---|
 | 1 | CMS, catalogue, environments, CI/CD pipeline | ✅ Complete — live URL, both deploy paths green |
 | 2 | Stripe Checkout, verified webhook, orders | ✅ Complete — both test cards run on both environments |
-| 3 | Optional tasks, README, evidence pack | In progress |
+| 3 | Optional tasks, README, evidence pack | ✅ Complete — go-live plan, rollback rehearsal, evidence pack, production rules |
+| 4 | Sizes, shipping, fulfilment, AI disclosure, legal page, data-subject rights | ✅ Complete — live in production |
 
 ---
 
